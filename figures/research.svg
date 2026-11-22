@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Equity and Index Research Team</title>
+  <desc id="desc">Per subject, a dated broker close and an opening search feed four independent specialist roles. Their memos feed a draft, closing search, critique and revised final report. The hedge worker verifies a batch with seven reports.</desc>
+  <defs>
+    <marker id="arrow-start" markerWidth="12" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 12 12">
+      <path d="M11 0 L0 6 L11 12 Z" fill="#52716F"/>
+    </marker>
+    <marker id="arrow-end" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 12 12">
+      <path d="M1 0 L12 6 L1 12 Z" fill="#52716F"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+  <g id="broker">
+    <title>Interactive Brokers</title>
+    <rect x="52" y="163" width="392" height="118" rx="8" fill="#F2F4F5" stroke="#AABAC0" stroke-width="1.8"/>
+    <text x="70" y="189" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#4B616B" text-anchor="start" letter-spacing="0.35">EXTERNAL MARKET DATA</text>
+    <text x="70" y="221" font-family="Open Sans, Arial, sans-serif" font-size="26" font-weight="700" fill="#18343E" text-anchor="start">Interactive Brokers</text>
+    <text x="70" y="244" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Dated regular-session close via</text>
+    <text x="70" y="269" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">read-only MCP.</text>
+  </g>
+  <g id="open">
+    <title>Opening evidence search</title>
+    <rect x="524" y="163" width="552" height="118" rx="8" fill="#FBF4E6" stroke="#CBAD72" stroke-width="1.8"/>
+    <text x="542" y="189" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#77551C" text-anchor="start" letter-spacing="0.35">EVIDENCE SEARCH · GPT-6.2 SOL</text>
+    <text x="542" y="221" font-family="Open Sans, Arial, sans-serif" font-size="26" font-weight="700" fill="#18343E" text-anchor="start">Opening evidence search</text>
+    <text x="542" y="245" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Collects dated findings and identifies gaps in coverage.</text>
+  </g>
+  <g id="web">
+    <title>Filings, releases and news</title>
+    <rect x="1156" y="163" width="392" height="118" rx="8" fill="#F2F4F5" stroke="#AABAC0" stroke-width="1.8"/>
+    <text x="1174" y="189" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#4B616B" text-anchor="start" letter-spacing="0.35">EXTERNAL PUBLIC SOURCES</text>
+    <text x="1174" y="221" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700" fill="#18343E" text-anchor="start">Filings, releases and news</text>
+    <text x="1174" y="244" font-family="Open Sans, Arial, sans-serif" font-size="19" font-weight="400" fill="#344F59" text-anchor="start">The team uses OpenAI hosted web</text>
+    <text x="1174" y="267" font-family="Open Sans, Arial, sans-serif" font-size="19" font-weight="400" fill="#344F59" text-anchor="start">search to retrieve public sources.</text>
+  </g>
+  <g id="brief">
+    <title>Shared research brief</title>
+    <rect x="52" y="313" width="1496" height="52" rx="5" fill="#F6F8F6" stroke="#A9BBB3" stroke-width="1.5"/>
+    <text x="70" y="347" font-family="Open Sans, Arial, sans-serif" font-size="23" font-weight="700" fill="#146B61" text-anchor="start">Shared research brief</text>
+    <text x="363" y="347" font-family="Open Sans, Arial, sans-serif" font-size="23" font-weight="400" fill="#344F59" text-anchor="start">Subject, dated price, information cutoff, source links, findings and gaps</text>
+  </g>
+  <g id="business">
+    <title>Business fundamentals</title>
+    <rect x="52" y="401" width="344" height="121" rx="8" fill="#ECF5F1" stroke="#99BCAE" stroke-width="1.8"/>
+    <text x="70" y="427" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="0.35">ROLE 1 · SOL</text>
+    <text x="70" y="459" font-family="Open Sans, Arial, sans-serif" font-size="25" font-weight="700" fill="#18343E" text-anchor="start">Business fundamentals</text>
+    <text x="70" y="484" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Operations, demand and</text>
+    <text x="70" y="509" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">earnings drivers.</text>
+  </g>
+  <g id="valuation">
+    <title>Valuation</title>
+    <rect x="436" y="401" width="344" height="121" rx="8" fill="#ECF5F1" stroke="#99BCAE" stroke-width="1.8"/>
+    <text x="454" y="427" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="0.35">ROLE 2 · SOL</text>
+    <text x="454" y="459" font-family="Open Sans, Arial, sans-serif" font-size="25" font-weight="700" fill="#18343E" text-anchor="start">Valuation</text>
+    <text x="454" y="484" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Valuation assumptions and</text>
+    <text x="454" y="509" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">expectations in the price.</text>
+  </g>
+  <g id="catalysts">
+    <title>Catalysts</title>
+    <rect x="820" y="401" width="344" height="121" rx="8" fill="#ECF5F1" stroke="#99BCAE" stroke-width="1.8"/>
+    <text x="838" y="427" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="0.35">ROLE 3 · SOL</text>
+    <text x="838" y="459" font-family="Open Sans, Arial, sans-serif" font-size="25" font-weight="700" fill="#18343E" text-anchor="start">Catalysts</text>
+    <text x="838" y="484" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Upcoming events that could</text>
+    <text x="838" y="509" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">change the outlook.</text>
+  </g>
+  <g id="geo">
+    <title>Geoeconomics</title>
+    <rect x="1204" y="401" width="344" height="121" rx="8" fill="#ECF5F1" stroke="#99BCAE" stroke-width="1.8"/>
+    <text x="1222" y="427" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="0.35">ROLE 4 · SOL</text>
+    <text x="1222" y="459" font-family="Open Sans, Arial, sans-serif" font-size="25" font-weight="700" fill="#18343E" text-anchor="start">Geoeconomics</text>
+    <text x="1222" y="484" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Policy, trade and geopolitical</text>
+    <text x="1222" y="509" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">exposure.</text>
+  </g>
+  <g id="draft">
+    <title>Forecast draft</title>
+    <rect x="52" y="584" width="344" height="126" rx="8" fill="#ECF5F1" stroke="#99BCAE" stroke-width="1.8"/>
+    <text x="70" y="610" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="0.35">ROLE 5 · SOL</text>
+    <text x="70" y="642" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700" fill="#18343E" text-anchor="start">Forecast draft</text>
+    <text x="70" y="668" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Combines the four memos into a</text>
+    <text x="70" y="693" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">provisional forecast.</text>
+  </g>
+  <g id="closing">
+    <title>Closing evidence search</title>
+    <rect x="436" y="584" width="344" height="126" rx="8" fill="#FBF4E6" stroke="#CBAD72" stroke-width="1.8"/>
+    <text x="454" y="610" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#77551C" text-anchor="start" letter-spacing="0.35">EVIDENCE SEARCH · SOL</text>
+    <text x="454" y="642" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700" fill="#18343E" text-anchor="start">Closing evidence search</text>
+    <text x="454" y="668" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Checks what changed after the</text>
+    <text x="454" y="693" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">opening cutoff.</text>
+  </g>
+  <g id="critic">
+    <title>Independent critique</title>
+    <rect x="820" y="584" width="344" height="126" rx="8" fill="#EDF2F8" stroke="#9DAFC4" stroke-width="1.8"/>
+    <text x="838" y="610" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#375671" text-anchor="start" letter-spacing="0.35">ROLE 6 · GPT-6.2 ASTRA</text>
+    <text x="838" y="642" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700" fill="#18343E" text-anchor="start">Independent critique</text>
+    <text x="838" y="668" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Searches for counterevidence</text>
+    <text x="838" y="693" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">and challenges the draft.</text>
+  </g>
+  <g id="final">
+    <title>Final report writer</title>
+    <rect x="1204" y="584" width="344" height="126" rx="8" fill="#EDF2F8" stroke="#9DAFC4" stroke-width="1.8"/>
+    <text x="1222" y="610" font-family="Open Sans, Arial, sans-serif" font-size="14" font-weight="700" fill="#375671" text-anchor="start" letter-spacing="0.35">ROLE 7 · ASTRA</text>
+    <text x="1222" y="642" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700" fill="#18343E" text-anchor="start">Final report writer</text>
+    <text x="1222" y="668" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Revises the draft using the</text>
+    <text x="1222" y="693" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">critique and both searches.</text>
+  </g>
+  <g id="pub">
+    <title>Cloud Storage batch</title>
+    <rect x="821" y="744" width="727" height="78" rx="8" fill="#E8F2ED" stroke="#82A99D" stroke-width="1.7"/>
+    <text x="840" y="773" font-family="Open Sans, Arial, sans-serif" font-size="23" font-weight="700" fill="#146B61" text-anchor="start">Publish the seven reports to Cloud Storage</text>
+    <text x="840" y="803" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Each includes a forecast or explains why the team abstained.</text>
+  </g>
+  <g id="consumer">
+    <title>Portfolio hedge worker</title>
+    <rect x="52" y="744" width="696" height="78" rx="8" fill="#E8F2ED" stroke="#82A99D" stroke-width="1.7"/>
+    <text x="71" y="773" font-family="Open Sans, Arial, sans-serif" font-size="23" font-weight="700" fill="#146B61" text-anchor="start">Portfolio hedge worker</text>
+    <text x="71" y="803" font-family="Open Sans, Arial, sans-serif" font-size="20" font-weight="400" fill="#344F59" text-anchor="start">Checks the session, all seven reports and the SHA-256 digest.</text>
+  </g>
+  <path id="wire-0" d="M 444 222 L 524 222" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Broker observation to opening brief</title>
+  </path>
+  <path id="wire-1" d="M 1156 222 L 1076 222" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Public sources to opening search</title>
+  </path>
+  <path id="wire-2" d="M 800 281 L 800 313" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Opening evidence to shared brief</title>
+  </path>
+  <path id="wire-3" d="M 224 365 L 224 401" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Shared brief to Business fundamentals</title>
+  </path>
+  <path id="wire-4" d="M 224 522 L 224 546" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round">
+    <title>Business fundamentals memo to synthesis</title>
+  </path>
+  <path id="wire-5" d="M 608 365 L 608 401" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Shared brief to Valuation</title>
+  </path>
+  <path id="wire-6" d="M 608 522 L 608 546" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round">
+    <title>Valuation memo to synthesis</title>
+  </path>
+  <path id="wire-7" d="M 992 365 L 992 401" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Shared brief to Catalysts</title>
+  </path>
+  <path id="wire-8" d="M 992 522 L 992 546" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round">
+    <title>Catalysts memo to synthesis</title>
+  </path>
+  <path id="wire-9" d="M 1376 365 L 1376 401" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Shared brief to Geoeconomics</title>
+  </path>
+  <path id="wire-10" d="M 1376 522 L 1376 546" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round">
+    <title>Geoeconomics memo to synthesis</title>
+  </path>
+  <path id="wire-11" d="M 224 546 L 1376 546" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round">
+    <title>Combine the four memos</title>
+  </path>
+  <path id="wire-12" d="M 224 546 L 224 584" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>All four memos to forecast draft</title>
+  </path>
+  <path id="wire-13" d="M 396 647 L 436 647" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Forecast draft to Closing evidence search</title>
+  </path>
+  <path id="wire-14" d="M 780 647 L 820 647" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Closing evidence search to Independent critique</title>
+  </path>
+  <path id="wire-15" d="M 1164 647 L 1204 647" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Independent critique to Final report writer</title>
+  </path>
+  <path id="wire-16" d="M 1376 710 L 1376 744" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Accepted subject reports to publisher</title>
+  </path>
+  <path id="wire-17" d="M 821 783 L 748 783" fill="none" stroke="#52716F" stroke-width="2.6" stroke-linecap="butt" stroke-linejoin="round" marker-end="url(#arrow-end)">
+    <title>Dated receipt and packet to hedge worker</title>
+  </path>
+  <path id="wire-18" d="M 52 842 L 1548 842" fill="none" stroke="#C5D2CE" stroke-width="1.4" stroke-linecap="butt" stroke-linejoin="round">
+    <title>footrule</title>
+  </path>
+  <text x="52" y="38" font-family="Open Sans, Arial, sans-serif" font-size="16" font-weight="700" fill="#146B61" text-anchor="start" letter-spacing="1.5">LOGICAL ARCHITECTURE</text>
+  <text x="50" y="95" font-family="Liberation Serif, Georgia, serif" font-size="53" font-weight="400" fill="#18343E" text-anchor="start">Equity and Index Research Team</text>
+  <text x="52" y="133" font-family="Open Sans, Arial, sans-serif" font-size="23" font-weight="400" fill="#344F59" text-anchor="start">The same seven roles assess each of six equities and the S&amp;P 500 cash index. Each assessment covers 20 trading sessions.</text>
+  <text x="249" y="572" font-family="Open Sans, Arial, sans-serif" font-size="17" font-weight="700" fill="#146B61" text-anchor="start">Four memos with supporting sources</text>
+  <text x="1548" y="572" font-family="Open Sans, Arial, sans-serif" font-size="17" font-weight="400" fill="#344F59" text-anchor="end">Each specialist searches the web. Two can work at once.</text>
+  <text x="52" y="875" font-family="Open Sans, Arial, sans-serif" font-size="19" font-weight="400" fill="#18343E" text-anchor="start">November 20, 2026 · The worker accepted seven reports from 49 role outputs and 14 opening or closing evidence searches.</text>
+</svg>

@@ -1,0 +1,10 @@
+{% if r.price.get('snapshot_status') == 'market_closed' %}
+<p>Configured quote session closed · quote request skipped.</p>
+{% elif r.price.get('snapshot_status') == 'entitlement_unverified' %}
+<p>Extended-hours data access is unverified · quote request skipped.</p>
+{% elif r.price.get('snapshot_status') == 'calendar_unavailable' %}
+<p>Trading calendar unavailable · quote request skipped; review required.</p>
+{% elif r.price.get('snapshot_status') in ('unavailable','error') %}
+<p>Latest quote request failed · saved context retains its original timestamp.</p>
+{% endif %}
+{% if r.price.get('snapshot_retrieved_at') %}<p class="quiet">Snapshot originally retrieved {{ r.price.snapshot_retrieved_at|eastern }}. A saved last trade is not necessarily the official closing price.</p>{% endif %}

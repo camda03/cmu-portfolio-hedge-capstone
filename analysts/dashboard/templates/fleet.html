@@ -1,0 +1,18 @@
+{% if fleet %}
+<section class="panel"><h2>Monitoring run</h2>
+<p>{{ fleet.phase.replace('_',' ').capitalize() }} · Checked {{ fleet.checked_at|eastern }}</p>
+{% set carried = fleet.subjects.values()|selectattr('predecessor_status','defined')|selectattr('predecessor_status','equalto','accepted_research_carried_forward')|list %}
+<p>{{ fleet.baselines_accepted|default(0) }} / {{ rows|length }} {% if carried %}accepted analyst baselines reused; original research dates retained{% else %}fresh analyst baselines accepted{% endif %}.</p>
+{% if fleet.starts_at %}<p class="quiet">Monitoring window: {{ fleet.starts_at|eastern }} — {{ fleet.ends_at|eastern }}</p>
+{% else %}<p class="quiet">Fresh research is preparing. The 24-hour monitoring window starts after every configured baseline is accepted.</p>{% endif %}
+{% if fleet.phase == 'ended_with_issues' %}<p class="flag">The monitoring window has ended with unresolved failures or coverage gaps. This monitoring run has no further research scheduled.</p>{% endif %}
+{% for reason in fleet.reasons %}<p class="flag">{{ reason.replace('_',' ') }}</p>{% endfor %}
+{% if not selected %}<div class="scroll"><table><thead><tr><th>Subject</th><th>Work status</th><th>Completed monitors</th><th>Attention</th></tr></thead><tbody>
+{% for symbol, item in fleet.subjects.items() %}<tr><td><a href="/target/{{ symbol }}">{{ symbol }}</a></td>
+<td>{{ item.phase.replace('_',' ').capitalize() }}</td><td>{{ item.get('completed_monitor_cycles',0) }}</td>
+<td>{% for reason in item.reasons %}<span class="flag">{{ reason|reason_label }}</span><br>{% endfor %}
+{% for reason in item.attention %}<span>{{ reason.replace('_',' ') }}</span><br>{% endfor %}</td></tr>{% endfor %}
+</tbody></table></div>{% endif %}
+<p class="quiet">Each security is monitored independently. A run allows up to 24 monitoring attempts and one reassessment by the Equity and Index Research Team.</p>
+</section>
+{% endif %}

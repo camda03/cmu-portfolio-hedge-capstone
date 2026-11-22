@@ -1,0 +1,35 @@
+{% if reassessment_error %}
+<div class="notice"><strong>Reassessment status unavailable</strong><p>The monitoring results below retain their own timestamps.</p></div>
+{% endif %}
+{% if reassessment_operations %}
+<section class="panel"><h2>Reassessment pilot</h2>
+<p>{{ reassessment_operations.phase.replace('_',' ').capitalize() }} · Checked {{ reassessment_operations.checked_at|eastern }}</p>
+<p class="quiet">This timestamp records the latest status check. The Equity and Index Research Team can reassess each security once during the monitoring window.</p>
+{% if reassessment_operations.phase == 'complete' %}<p>The test window has finished. Research results below retain their original dates. Completion alone does not certify production readiness.</p>{% endif %}
+{% if reassessment_operations.get('window_ended') and reassessment_operations.phase != 'complete' %}<p>The test window has ended with unresolved work. Saved results and failures retain their original dates.</p>{% endif %}
+{% for reason in reassessment_operations.reasons %}<p class="flag">{{ reason|reason_label }}</p>{% endfor %}
+{% if reassessment_operations.get('attention') %}
+<h3>Items for review</h3>
+{% for item in reassessment_operations.attention %}<p>{{ item.replace('_',' ') }}</p>{% endfor %}
+{% endif %}
+{% if reassessment_operations.get('pending_referrals') %}<p>{{ reassessment_operations.pending_referrals }} saved referral(s) {{ 'under review in the running reassessment' if reassessment_operations.phase == 'reassessing' else 'awaiting comparison with the accepted baseline' if reassessment_operations.get('comparison_pending') else 'waiting; the test’s reassessment limit remains in force' }}.</p>{% endif %}
+</section>
+{% endif %}
+{% if reassessment %}
+<section class="panel"><div class="eyebrow">Equity and Index Research Team</div>
+<h2>Latest analyst baseline</h2>
+<p>Issued {{ reassessment.forecast.issued_at|eastern }} · Through {{ reassessment.forecast.horizon_end }}</p>
+<p class="quiet">The assessment below uses the baseline that was available when the monitor ran. This research pilot has no order routing.</p>
+{% for item in reassessment.forecast.reassessment_dispositions %}
+<article class="evidence"><span class="pill">{{ item.disposition.capitalize() }}</span>
+<h3>{{ item.referral_id }}</h3><p class="long">{{ item.reason|research_copy }}</p>
+<p class="long">{{ item.forecast_effect|research_copy }}</p><h3>Remaining watch</h3><p class="long">{{ item.remaining_watch|research_copy }}</p>
+{% for url in item.evidence_urls %}{% if url|safeurl %}<a href="{{ url|safeurl }}" target="_blank" rel="noopener noreferrer">{{ url }}</a>{% endif %}{% endfor %}
+</article>{% endfor %}
+<details><summary>Full research report</summary><p class="long">{{ reassessment.report|research_copy }}</p></details>
+{% for name, stage in reassessment.stages.items() %}{% if name != 'report' %}
+<details><summary>{{ name.capitalize() }} analyst</summary><p class="long">{{ stage.text|research_copy }}</p></details>
+{% endif %}{% endfor %}
+<p class="quiet">{{ reassessment.cost_note|research_copy }}</p>
+</section>
+{% endif %}
