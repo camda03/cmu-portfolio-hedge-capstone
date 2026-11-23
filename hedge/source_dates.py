@@ -60,7 +60,8 @@ def source_dates(inputs):
         elif horizon and horizon < session:
             status, note = "Expired", "Forecast horizon has ended."
         elif (
-            cutoff.astimezone(EASTERN).date() < prior or date.fromisoformat(inputs["batch_date"]) < prior
+            cutoff.astimezone(EASTERN).date() < prior
+            or date.fromisoformat(inputs["batch_date"]) < prior
         ):
             status, note = "Stale", "Older than the preceding NYSE session."
         add(
@@ -113,7 +114,9 @@ def source_dates(inputs):
         if hours is not None
         else inputs.get("gdelt_gap") or "No dated observation window."
     )
-    delivery = g.get("delivery_created_at") if dated(g.get("delivery_created_at"), instant) else None
+    delivery = (
+        g.get("delivery_created_at") if dated(g.get("delivery_created_at"), instant) else None
+    )
     add("GDELT", "Current-news cohort", end if news_end else None, delivery, None, status, note)
     issued = (g.get("research") or {}).get("created_at")
     if g:

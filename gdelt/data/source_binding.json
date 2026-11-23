@@ -1,0 +1,91 @@
+{
+  "annotation_policy": "Project both plain and enhanced fields wherever present; normalization measures their overlap and contribution.",
+  "columns": {
+    "DATE": {
+      "source_mode": "NULLABLE",
+      "source_name": "DATE",
+      "source_type": "INTEGER"
+    },
+    "DocumentIdentifier": {
+      "source_mode": "NULLABLE",
+      "source_name": "DocumentIdentifier",
+      "source_type": "STRING"
+    },
+    "ExtrasXML": {
+      "source_mode": "NULLABLE",
+      "source_name": "Extras",
+      "source_type": "STRING"
+    },
+    "GKGRECORDID": {
+      "source_mode": "NULLABLE",
+      "source_name": "GKGRECORDID",
+      "source_type": "STRING"
+    },
+    "Locations": {
+      "source_mode": "NULLABLE",
+      "source_name": "Locations",
+      "source_type": "STRING"
+    },
+    "Organizations": {
+      "source_mode": "NULLABLE",
+      "source_name": "Organizations",
+      "source_type": "STRING"
+    },
+    "Persons": {
+      "source_mode": "NULLABLE",
+      "source_name": "Persons",
+      "source_type": "STRING"
+    },
+    "SourceCollectionIdentifier": {
+      "source_mode": "NULLABLE",
+      "source_name": "SourceCollectionIdentifier",
+      "source_type": "INTEGER"
+    },
+    "SourceCommonName": {
+      "source_mode": "NULLABLE",
+      "source_name": "SourceCommonName",
+      "source_type": "STRING"
+    },
+    "Themes": {
+      "source_mode": "NULLABLE",
+      "source_name": "Themes",
+      "source_type": "STRING"
+    },
+    "TranslationInfo": {
+      "source_mode": "NULLABLE",
+      "source_name": "TranslationInfo",
+      "source_type": "STRING"
+    },
+    "V2Locations": {
+      "source_mode": "NULLABLE",
+      "source_name": "V2Locations",
+      "source_type": "STRING"
+    },
+    "V2Organizations": {
+      "source_mode": "NULLABLE",
+      "source_name": "V2Organizations",
+      "source_type": "STRING"
+    },
+    "V2Persons": {
+      "source_mode": "NULLABLE",
+      "source_name": "V2Persons",
+      "source_type": "STRING"
+    },
+    "V2Themes": {
+      "source_mode": "NULLABLE",
+      "source_name": "V2Themes",
+      "source_type": "STRING"
+    }
+  },
+  "include_title": true,
+  "location": "US",
+  "partitioning": "INGESTION_TIME_DAY",
+  "source_population": {
+    "SourceCollectionIdentifier": 1,
+    "document_identifier": "nonempty HTTP(S) web identifier; full URL validity remains a local normalization check",
+    "events_or_mentions_join": false,
+    "language_filter": null
+  },
+  "source_table": "gdelt-bq.gdeltv2.gkg_partitioned",
+  "title_policy": "Project available literal Title and ExtrasXML/Extras for bounded title diagnostics."
+}

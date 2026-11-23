@@ -70,6 +70,7 @@ def evaluate_hedges(
     rows = []
     for target in dict.fromkeys([current, *targets]):
         delta = target - current
+        # Trade only the difference from the open position. A hold incurs no new fee.
         fees = abs(delta) * cost
         exposure = other + target * unit
         net_beta = None if missing else (equity_beta_dollars + exposure) / nav

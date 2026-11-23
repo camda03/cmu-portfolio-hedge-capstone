@@ -1,0 +1,381 @@
+{
+  "background_sample": {
+    "basis_points": 500,
+    "hash": "SHA256(salt + newline + document_id); first 8 hex digits interpreted unsigned; < floor(2^32*basis_points/10000)",
+    "monitoring_sample_flag_is_independent_of_rules": true,
+    "salt": "gkg-sp500-feature-gate-v01-r01-background-v1"
+  },
+  "conjunction_scope": "same_selected_document_revision",
+  "created_at_utc": "2026-11-01T04:04:52Z",
+  "expected_documents": 2000000,
+  "feature_family": "theme",
+  "groups": {
+    "banking_context": [
+      "WB_318_FINANCIAL_ARCHITECTURE_AND_BANKING",
+      "WB_1234_BANKING_INSTITUTIONS",
+      "WB_317_BANK_REGULATION_AND_SUPERVISION"
+    ],
+    "broader_economic_context": [
+      "EPU_ECONOMY",
+      "EPU_ECONOMY_HISTORIC",
+      "EPU_POLICY_BUDGET",
+      "EPU_POLICY_SPENDING",
+      "ECON_DEBT",
+      "WB_2748_EMPLOYMENT",
+      "WB_856_WAGES",
+      "WB_1281_MANUFACTURING",
+      "WB_698_TRADE"
+    ],
+    "conflict_disruption_recovery": [
+      "ARMEDCONFLICT",
+      "POLITICAL_TURMOIL",
+      "MARITIME_INCIDENT",
+      "NATURAL_DISASTER",
+      "WB_2480_POST_CONFLICT_RECONSTRUCTION",
+      "WB_2482_RECONCILIATION",
+      "NEGOTIATIONS"
+    ],
+    "cross_border_conflict_resolution": [
+      "SANCTIONS",
+      "BLOCKADE",
+      "CEASEFIRE"
+    ],
+    "energy_logistics_context": [
+      "ENV_OIL",
+      "ENV_NATURALGAS",
+      "WB_2299_PIPELINES",
+      "WB_167_PORTS",
+      "WB_793_TRANSPORT_AND_LOGISTICS_SERVICES"
+    ],
+    "energy_prices_policy": [
+      "ECON_OILPRICE",
+      "WB_539_OIL_AND_GAS_POLICY_STRATEGY_AND_INSTITUTIONS"
+    ],
+    "financial_stability": [
+      "WB_1098_MONETARY_AND_FINANCIAL_STABILITY",
+      "WB_1245_FINANCIAL_VULNERABILITY_AND_RISKS",
+      "EPU_CATS_SOVEREIGN_DEBT_CURRENCY_CRISES"
+    ],
+    "fiscal": [
+      "WB_445_FISCAL_POLICY",
+      "EPU_CATS_FISCAL_POLICY",
+      "ECON_BUDGET_DEFICIT",
+      "ECON_TAXATION"
+    ],
+    "general_policy": [
+      "EPU_POLICY",
+      "EPU_POLICY_GOVERNMENT",
+      "EPU_POLICY_LAW",
+      "GENERAL_GOVERNMENT"
+    ],
+    "growth_labor_housing": [
+      "WB_471_ECONOMIC_GROWTH",
+      "UNEMPLOYMENT",
+      "ECON_HOUSING_PRICES",
+      "ECON_COST_OF_LIVING"
+    ],
+    "industrial_system_context": [
+      "WB_508_POWER_SYSTEMS",
+      "WB_1281_MANUFACTURING",
+      "WB_167_PORTS",
+      "WB_793_TRANSPORT_AND_LOGISTICS_SERVICES",
+      "WB_2299_PIPELINES"
+    ],
+    "infrastructure_disruption_recovery": [
+      "POWER_OUTAGE",
+      "CYBER_ATTACK",
+      "NATURAL_DISASTER",
+      "CRISISLEX_T04_INFRASTRUCTURE"
+    ],
+    "insolvency": [
+      "ECON_BANKRUPTCY"
+    ],
+    "labor_disruption": [
+      "STRIKE"
+    ],
+    "markets_earnings": [
+      "ECON_STOCKMARKET",
+      "WB_332_CAPITAL_MARKETS",
+      "ECON_EARNINGSREPORT",
+      "EPU_CATS_FINANCIAL_REGULATION"
+    ],
+    "monetary": [
+      "ECON_CENTRALBANK",
+      "ECON_INTEREST_RATES",
+      "ECON_INFLATION",
+      "EPU_CATS_MONETARY_POLICY"
+    ],
+    "pandemic": [
+      "HEALTH_PANDEMIC",
+      "WB_2167_PANDEMICS"
+    ],
+    "political_uncertainty": [
+      "ELECTION",
+      "POLITICAL_TURMOIL",
+      "EPU_UNCERTAINTY"
+    ],
+    "system_context": [
+      "ENV_NATURALGAS",
+      "ENV_OIL",
+      "WB_1234_BANKING_INSTITUTIONS",
+      "WB_1281_MANUFACTURING",
+      "WB_167_PORTS",
+      "WB_2299_PIPELINES",
+      "WB_317_BANK_REGULATION_AND_SUPERVISION",
+      "WB_318_FINANCIAL_ARCHITECTURE_AND_BANKING",
+      "WB_508_POWER_SYSTEMS",
+      "WB_793_TRANSPORT_AND_LOGISTICS_SERVICES"
+    ],
+    "trade_fx": [
+      "WB_775_TRADE_POLICY_AND_INTEGRATION",
+      "WB_2575_TRADE_POLICY_AND_INVESTMENT_AGREEMENTS",
+      "ECON_CURRENCY_EXCHANGE_RATE",
+      "ECON_FREETRADE",
+      "ECON_TRADE_DISPUTE"
+    ],
+    "watch_context": [
+      "ECON_DEBT",
+      "ENV_NATURALGAS",
+      "ENV_OIL",
+      "EPU_ECONOMY",
+      "EPU_ECONOMY_HISTORIC",
+      "EPU_POLICY_BUDGET",
+      "EPU_POLICY_SPENDING",
+      "WB_1234_BANKING_INSTITUTIONS",
+      "WB_1281_MANUFACTURING",
+      "WB_167_PORTS",
+      "WB_2299_PIPELINES",
+      "WB_2748_EMPLOYMENT",
+      "WB_317_BANK_REGULATION_AND_SUPERVISION",
+      "WB_318_FINANCIAL_ARCHITECTURE_AND_BANKING",
+      "WB_508_POWER_SYSTEMS",
+      "WB_698_TRADE",
+      "WB_793_TRANSPORT_AND_LOGISTICS_SERVICES",
+      "WB_856_WAGES"
+    ],
+    "watch_disruption_recovery": [
+      "ARMEDCONFLICT",
+      "CRISISLEX_T04_INFRASTRUCTURE",
+      "CYBER_ATTACK",
+      "MARITIME_INCIDENT",
+      "NATURAL_DISASTER",
+      "NEGOTIATIONS",
+      "POLITICAL_TURMOIL",
+      "POWER_OUTAGE",
+      "STRIKE",
+      "WB_2480_POST_CONFLICT_RECONSTRUCTION",
+      "WB_2482_RECONCILIATION"
+    ]
+  },
+  "known_gaps": [
+    "Consumer-demand and retail-sales release coverage is not verified as comprehensive.",
+    "No issuer membership, issuer materiality, earnings-surprise or expectation-outcome classifier.",
+    "No verified complete treatment of reopening, nascent shocks or missing topic tags.",
+    "No proof that co-occurring features describe the same event.",
+    "Published code existence does not establish an exact current production tagging rule."
+  ],
+  "match_mode": "exact",
+  "normalization": "Unicode NFKC casefold; whitespace collapse; trim; distinct complete labels",
+  "profile_tiers": {
+    "broad": [
+      "direct",
+      "context",
+      "watch"
+    ],
+    "expanded": [
+      "direct",
+      "context"
+    ],
+    "narrow": [
+      "direct"
+    ]
+  },
+  "proposed_review_profile": "expanded",
+  "purpose": "Prioritize candidates for S&P 500 situation-similarity indexing; preserve compact metadata and an unbiased monitoring sample.",
+  "release": "gkg-sp500-feature-gate-v01-r01",
+  "rules": [
+    {
+      "label": "Monetary policy and inflation",
+      "priority": 1,
+      "rationale": "Potential discount-rate, financing-cost and inflation channel; no directional inference.",
+      "required_groups": [
+        "monetary"
+      ],
+      "rule_id": "D01",
+      "tier": "direct"
+    },
+    {
+      "label": "Growth, labor, housing and living costs",
+      "priority": 2,
+      "rationale": "Potential aggregate demand and earnings channel; national scale is not established by the tag.",
+      "required_groups": [
+        "growth_labor_housing"
+      ],
+      "rule_id": "D02",
+      "tier": "direct"
+    },
+    {
+      "label": "Fiscal policy and public finance",
+      "priority": 3,
+      "rationale": "Potential spending, taxation and sovereign-financing channel; local and routine news may match.",
+      "required_groups": [
+        "fiscal"
+      ],
+      "rule_id": "D03",
+      "tier": "direct"
+    },
+    {
+      "label": "Trade policy and foreign exchange",
+      "priority": 4,
+      "rationale": "Potential trade, input-cost and international earnings channel.",
+      "required_groups": [
+        "trade_fx"
+      ],
+      "rule_id": "D04",
+      "tier": "direct"
+    },
+    {
+      "label": "Capital markets and earnings reports",
+      "priority": 5,
+      "rationale": "Useful financial-topic candidates; does not establish issuer size, surprise or advance information.",
+      "required_groups": [
+        "markets_earnings"
+      ],
+      "rule_id": "D05",
+      "tier": "direct"
+    },
+    {
+      "label": "Financial stability and sovereign stress",
+      "priority": 6,
+      "rationale": "Potential credit and financial-system channel; a topic mention is not proof of stress.",
+      "required_groups": [
+        "financial_stability"
+      ],
+      "rule_id": "D06",
+      "tier": "direct"
+    },
+    {
+      "label": "Energy prices and policy",
+      "priority": 7,
+      "rationale": "Potential energy-cost and inflation channel; includes policy change in either direction.",
+      "required_groups": [
+        "energy_prices_policy"
+      ],
+      "rule_id": "D07",
+      "tier": "direct"
+    },
+    {
+      "label": "Sanctions, blockades and ceasefires",
+      "priority": 8,
+      "rationale": "Broad geopolitical topics with plausible transmission; scope and actual occurrence require review.",
+      "required_groups": [
+        "cross_border_conflict_resolution"
+      ],
+      "rule_id": "D08",
+      "tier": "direct"
+    },
+    {
+      "label": "Pandemic topics",
+      "priority": 9,
+      "rationale": "Broad systemic-health fallback without requiring an economic tag; misses some emerging unlabeled threats.",
+      "required_groups": [
+        "pandemic"
+      ],
+      "rule_id": "D09",
+      "tier": "direct"
+    },
+    {
+      "label": "Insolvency with banking context",
+      "priority": 10,
+      "rationale": "Same-article conjunction; does not establish a confirmed bank failure.",
+      "required_groups": [
+        "insolvency",
+        "banking_context"
+      ],
+      "rule_id": "C01",
+      "tier": "context"
+    },
+    {
+      "label": "Conflict or recovery with energy or logistics",
+      "priority": 11,
+      "rationale": "Includes reconstruction and negotiation; co-occurrence does not prove a semantic connection.",
+      "required_groups": [
+        "conflict_disruption_recovery",
+        "energy_logistics_context"
+      ],
+      "rule_id": "C02",
+      "tier": "context"
+    },
+    {
+      "label": "Labor disruption with an industrial system",
+      "priority": 12,
+      "rationale": "Potential production or transport channel; story scale remains unmeasured.",
+      "required_groups": [
+        "labor_disruption",
+        "industrial_system_context"
+      ],
+      "rule_id": "C03",
+      "tier": "context"
+    },
+    {
+      "label": "Infrastructure disruption or recovery with a system",
+      "priority": 13,
+      "rationale": "The infrastructure family can cover restored services as well as damage.",
+      "required_groups": [
+        "infrastructure_disruption_recovery",
+        "system_context"
+      ],
+      "rule_id": "C04",
+      "tier": "context"
+    },
+    {
+      "label": "Politics or uncertainty with economic context",
+      "priority": 14,
+      "rationale": "Requires economic context; political names alone are not predicates.",
+      "required_groups": [
+        "political_uncertainty",
+        "broader_economic_context"
+      ],
+      "rule_id": "C05",
+      "tier": "context"
+    },
+    {
+      "label": "General policy with an economic system",
+      "priority": 15,
+      "rationale": "Broad regulatory/operational channel; not a formal economic-policy-uncertainty measure.",
+      "required_groups": [
+        "general_policy",
+        "system_context"
+      ],
+      "rule_id": "C06",
+      "tier": "context"
+    },
+    {
+      "label": "Broader economic and system context",
+      "priority": 16,
+      "rationale": "Broad sensitivity profile; deliberately includes routine sector coverage.",
+      "required_groups": [
+        "watch_context"
+      ],
+      "rule_id": "W01",
+      "tier": "watch"
+    },
+    {
+      "label": "Disruption and recovery without channel tag",
+      "priority": 17,
+      "rationale": "Broad sensitivity profile; protects some missing-channel cases but can admit local/historical stories.",
+      "required_groups": [
+        "watch_disruption_recovery"
+      ],
+      "rule_id": "W02",
+      "tier": "watch"
+    }
+  ],
+  "schema": "gkg-sp500-feature-gate-v0.1",
+  "source_tables": [
+    "corpus_documents",
+    "parsed_observations"
+  ],
+  "status": "draft_heuristic_not_market_validated",
+  "unmatched_policy": "Retain compact metadata. Eligible for the deterministic background sample; no claim of irrelevance."
+}

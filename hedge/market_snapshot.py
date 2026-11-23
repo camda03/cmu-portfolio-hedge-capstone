@@ -60,7 +60,13 @@ def collect(broker_dir, policy, output, session):
         request = dict(identity, market_data_names=["last", "top_status", "bid_ask", "prior_close"])
         path = output / (symbol + ".json")
         subprocess.run(
-            ["bash", str(broker_dir / "connect_ibkr.sh"), "snapshot", json.dumps(request), str(path)],
+            [
+                "bash",
+                str(broker_dir / "connect_ibkr.sh"),
+                "snapshot",
+                json.dumps(request),
+                str(path),
+            ],
             check=True,
             timeout=1010,
         )

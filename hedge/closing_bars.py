@@ -7,11 +7,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from hedge_session import read_json, require, save
+from hedge_session import ROOT, read_json, require, save
 from ledger import EASTERN, MES, instant, number
 from market_snapshot import broker_payload
 
-# IBKR identities from the research team's instrument catalog.
+# IBKR identities from the Big Seven producer's dashboard/securities.json.
 CONIDS = {
     "AAPL": 265598,
     "DE": 6393,
@@ -37,7 +37,9 @@ def contracts(future):
     )
     instruments = {s: dict(contract_id=v, security_type="STK") for s, v in CONIDS.items()}
     instruments["SP500"].update(security_type="IND", exchange="CBOE")
-    instruments[contract] = dict(contract_id=future["contract_id"], security_type="FUT", exchange="CME")
+    instruments[contract] = dict(
+        contract_id=future["contract_id"], security_type="FUT", exchange="CME"
+    )
     return contract, instruments
 
 
@@ -68,7 +70,9 @@ def close_market(capture, future, now):
     sessions = completed_sessions(max(times))
     require(len(sessions) >= 2, "Two completed common sessions are required.")
     previous, day = [v.date().isoformat() for v in sessions.index[-2:]]
-    require(day.replace("-", "") < future["last_trading_date"], "The selected MES is at or past expiry.")
+    require(
+        day.replace("-", "") < future["last_trading_date"], "The selected MES is at or past expiry."
+    )
     quotes = {}
     for row in rows:
         symbol, request, bars = row["symbol"], row["request"], row["bar_series"]
@@ -176,7 +180,9 @@ def calibrated_policy(capture, policy, session, mode, now):
     for row in capture["instruments"]:
         if row["symbol"] in CONIDS:
             bars = row["bar_series"]
-            dates = [instant(value).astimezone(EASTERN).date().isoformat() for value in bars["time"]]
+            dates = [
+                instant(value).astimezone(EASTERN).date().isoformat() for value in bars["time"]
+            ]
             series[row["symbol"]] = pd.Series(bars["close"], index=dates, dtype=float)
     prices = pd.DataFrame(series).sort_index().loc[:price_day].tail(64)
     require(
@@ -196,7 +202,7 @@ def calibrated_policy(capture, policy, session, mode, now):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--broker-dir", type=Path, required=True)
-    p.add_argument("--policy", type=Path, required=True)
+    p.add_argument("--policy", type=Path, default=ROOT / "demo_assets/pilot.example.json")
     p.add_argument("--out", type=Path, required=True)
     p.add_argument(
         "--policy-out", type=Path, help="write the policy with six independently estimated betas"

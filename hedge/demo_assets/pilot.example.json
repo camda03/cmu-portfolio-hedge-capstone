@@ -1,0 +1,30 @@
+{
+  "description": "Illustrative simulation assumptions. Select the actual candidates, costs and age policy for an in-session advisory test.",
+  "targets": [
+    -2,
+    -1,
+    0,
+    1
+  ],
+  "cost_per_contract_usd": 2,
+  "max_mark_age_seconds": 120,
+  "scenarios": {
+    "rally": {
+      "index_return": 0.02
+    },
+    "flat": {
+      "index_return": 0
+    },
+    "decline": {
+      "index_return": -0.02
+    }
+  },
+  "future": {
+    "root": "MES",
+    "contract_month": "202612",
+    "contract_id": 815824257,
+    "exchange": "CME",
+    "multiplier": 5,
+    "last_trading_date": "20261218"
+  }
+}

@@ -1,0 +1,2461 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio hedge desk · CMU Capstone</title>
+  <style>
+:root {
+  color-scheme: light;
+  --ink: #15243b;
+  --sub: #485973;
+  --muted: #566981;
+  --teal: #007b68;
+  --nav: #101c30;
+  --blue: #385bcb;
+  --paper: #f3f6fa;
+  --panel: white;
+  --line: #d8e0ea;
+  --up: #067965;
+  --down: #a34c32;
+  font: 16px/1.48 "Inter", "Arial", sans-serif;
+}
+
+* {
+  box-sizing: border-box
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink)
+}
+
+button,
+input,
+select {
+  font: inherit
+}
+
+button,
+select,
+summary,
+a {
+  touch-action: manipulation
+}
+
+button,
+select,
+.button,
+.file-button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: white;
+  color: var(--ink);
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: .875rem;
+  cursor: pointer
+}
+
+button:hover,
+.button:hover,
+.file-button:hover,
+select:hover {
+  background: #ecf1fa
+}
+
+:focus-visible {
+  outline: 3px solid #527bff;
+  outline-offset: 3px
+}
+
+a {
+  color: #2d50b4;
+  text-underline-offset: 3px
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 205px minmax(0, 1fr);
+  min-height: 100vh
+}
+
+aside {
+  background: var(--nav);
+  color: #f6f9ff;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 30px 15px 18px;
+  display: flex;
+  flex-direction: column
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 9px 29px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.26rem;
+  font-weight: 750;
+  letter-spacing: -.045em
+}
+
+.brand small {
+  display: block;
+  color: #bdcbe1;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: .65rem;
+  font-weight: 650;
+  margin-top: 1px
+}
+
+.brand-mark {
+  width: 33px;
+  height: 33px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  background: #5677f0;
+  border-radius: 8px;
+  padding: 7px;
+  flex-shrink: 0
+}
+
+.brand-mark i {
+  display: block;
+  width: 4px;
+  background: white;
+  border-radius: 2px
+}
+
+.brand-mark i:nth-child(1) {
+  height: 8px
+}
+
+.brand-mark i:nth-child(2) {
+  height: 13px
+}
+
+.brand-mark i:nth-child(3) {
+  height: 18px
+}
+
+nav {
+  display: grid;
+  gap: 4px
+}
+
+nav button {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: #c6d2e5;
+  padding: 10px 13px;
+  font-weight: 520;
+  font-size: .94rem;
+  border-radius: 6px
+}
+
+nav button:hover {
+  background: #1a2c47;
+  color: #fff
+}
+
+nav button.on {
+  background: #293e66;
+  color: white;
+  box-shadow: inset 3px 0 #91a8ff
+}
+
+.nav-group {
+  font-size: .71rem;
+  color: #a4b4cc;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  font-weight: 650;
+  margin: 22px 12px 5px
+}
+
+nav .nav-group:first-child {
+  margin-top: 8px
+}
+
+aside footer {
+  margin-top: auto;
+  border-top: 1px solid #2e3b50;
+  padding: 18px 8px 0;
+  color: #c6d2e5;
+  font-size: .82rem
+}
+
+main {
+  min-width: 0;
+  width: 100%;
+  max-width: 1580px;
+  margin: auto;
+  margin-top: 0;
+  padding: 0 clamp(18px, 3vw, 46px) 36px
+}
+
+.top {
+  min-height: 63px;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  color: var(--sub);
+  font-size: .83rem
+}
+
+.top-left,
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap
+}
+
+.mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 650
+}
+
+.mode:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: #4973ba;
+  border-radius: 50%
+}
+
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0
+}
+
+.file-button:focus-within {
+  outline: 3px solid #527bff
+}
+
+#run-error:empty {
+  display: none
+}
+
+article {
+  min-width: 0
+}
+
+.page-heading {
+  margin: 24px 0 19px
+}
+
+h1 {
+  font-size: clamp(1.95rem, 3vw, 2.9rem);
+  letter-spacing: -.06em;
+  line-height: 1.12;
+  margin: 25px 0 7px
+}
+
+.page-heading h1 {
+  margin: 0 0 6px
+}
+
+.page-heading p,
+.intro,
+.note,
+.empty,
+.source-date,
+.origin-note {
+  color: var(--sub)
+}
+
+.page-heading p {
+  margin: 0;
+  font-size: .97rem
+}
+
+.page-heading p span {
+  margin: 0 5px;
+  color: #9aa9bc
+}
+
+h2 {
+  font-size: 1.12rem;
+  letter-spacing: -.026em;
+  margin: 0 0 8px;
+  line-height: 1.3
+}
+
+h3 {
+  font-size: .98rem;
+  margin: 0 0 5px
+}
+
+.intro {
+  max-width: 88ch;
+  margin: 0 0 19px
+}
+
+.note,
+.empty {
+  font-size: .87rem;
+  line-height: 1.55;
+  margin: 6px 0 12px
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap
+}
+
+.row h2 {
+  margin: 0
+}
+
+.kpis {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 19px 0;
+  margin: 14px 0 16px
+}
+
+.kpi {
+  padding: 0 clamp(12px, 1.45vw, 24px);
+  display: grid;
+  gap: 4px
+}
+
+.kpi+.kpi {
+  border-left: 1px solid var(--line)
+}
+
+.kpi>span,
+.stat label {
+  color: #415470;
+  font-weight: 600;
+  font-size: .85rem
+}
+
+.kpi strong,
+.stat strong,
+.pos-number,
+.amount,
+td,
+.perf-legend strong {
+  font-variant-numeric: tabular-nums
+}
+
+.kpi strong {
+  font-weight: 650;
+  font-size: clamp(1.45rem, 2.2vw, 2.15rem);
+  letter-spacing: -.055em;
+  line-height: 1.25
+}
+
+.kpi small,
+.stat span {
+  font-size: .79rem;
+  color: var(--muted)
+}
+
+.primary-ink {
+  color: var(--blue)
+}
+
+.gain-ink {
+  color: var(--up)
+}
+
+.cost-ink {
+  color: var(--down)
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.68fr) minmax(242px, 1fr);
+  gap: 16px;
+  align-items: stretch
+}
+
+.panel,
+.position,
+.stats {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-width: 0;
+  margin: 0 0 14px;
+  padding: 20px 22px
+}
+
+.overview-grid>.panel,
+.overview-grid>.position {
+  margin: 0
+}
+
+.panel>p:last-child {
+  margin-bottom: 0
+}
+
+.position {
+  background: #192b49;
+  color: #f8fbff;
+  border-color: #192b49;
+  display: flex;
+  flex-direction: column
+}
+
+.pos-head,
+.pos-foot,
+.position dl div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px
+}
+
+.pos-head h2 {
+  margin: 0;
+  font-size: 1.03rem;
+  color: #e5ebf5
+}
+
+.paper-tag {
+  font-size: .73rem;
+  background: #2e4468;
+  color: #e4edff;
+  padding: 3px 8px;
+  border-radius: 4px
+}
+
+.pos-number {
+  font-size: clamp(1.9rem, 3vw, 3rem);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -.055em;
+  margin: 17px 0 2px
+}
+
+.pos-number span {
+  font-size: .53em;
+  color: #b3c7f2;
+  letter-spacing: 0
+}
+
+.position p,
+.pos-foot>span,
+.position dt {
+  color: #c0cfea;
+  font-size: .84rem
+}
+
+.position p {
+  margin: 3px 0 12px
+}
+
+.position dl {
+  margin: 0 0 10px
+}
+
+.position dl div {
+  padding: 3px 0
+}
+
+.position dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums
+}
+
+.pos-foot {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #3b506e
+}
+
+.textlink {
+  font-weight: 650;
+  font-size: .87rem;
+  text-decoration: none
+}
+
+.textlink:hover {
+  text-decoration: underline
+}
+
+.position .textlink {
+  color: #c8d5ff
+}
+
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  background: #edf1f7;
+  border: 1px solid #dce3ed;
+  padding: 2px;
+  border-radius: 7px
+}
+
+.seg button {
+  background: transparent;
+  color: #52637b;
+  border: 0;
+  font-size: .79rem;
+  padding: 4px 9px;
+  border-radius: 4px
+}
+
+.seg button[aria-pressed=true] {
+  background: #fff;
+  color: #263e79;
+  box-shadow: 0 1px 3px #23376025
+}
+
+.stressgraph {
+  margin: 15px 0
+}
+
+.stressrow {
+  display: grid;
+  grid-template-columns: minmax(98px, .82fr) minmax(58px, 1.3fr) minmax(76px, .62fr);
+  gap: 10px;
+  align-items: center;
+  padding: 7px 0
+}
+
+.stressrow strong,
+.amount {
+  font-size: .9rem
+}
+
+.stressrow small {
+  color: var(--muted);
+  display: block;
+  font-size: .75rem;
+  font-weight: 450
+}
+
+.track {
+  position: relative;
+  height: 27px;
+  background: repeating-linear-gradient(90deg, #f4f6fa, #f4f6fa calc(25% - 1px), #e0e7ef calc(25% - 1px), #e0e7ef 25%);
+  border-radius: 3px
+}
+
+.zero {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid #a1afbf
+}
+
+.trackbar {
+  position: absolute;
+  border-radius: 2px;
+  min-width: 1px
+}
+
+.track.single .trackbar {
+  height: 10px;
+  top: 8px
+}
+
+.track.paired .unhedged {
+  height: 7px;
+  top: 5px
+}
+
+.track.paired .selected {
+  height: 7px;
+  bottom: 5px
+}
+
+.gain {
+  background: #168c79
+}
+
+.cost {
+  background: #bd724d
+}
+
+.selected {
+  background: #4d68c8
+}
+
+.unhedged {
+  background: #8998ab
+}
+
+.amount {
+  text-align: right;
+  font-weight: 650
+}
+
+.legend,
+.perf-legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  color: var(--sub);
+  font-size: .78rem
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex: none
+}
+
+.legend .dot:not(:first-child) {
+  margin-left: 10px
+}
+
+.perf-legend {
+  margin: 13px 0 2px;
+  gap: 14px
+}
+
+.perf-legend>span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px
+}
+
+.perf-legend strong {
+  color: var(--ink)
+}
+
+.figure {
+  margin: 7px 0 3px
+}
+
+.figure svg {
+  width: 100%;
+  display: block;
+  height: auto;
+  max-height: 265px
+}
+
+.research-hub h2 {
+  margin-bottom: 11px
+}
+
+.research-link {
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 0 2px
+}
+
+.research-link:hover b {
+  text-decoration: underline
+}
+
+.research-link span:nth-child(2) {
+  flex: 1;
+  min-width: 0
+}
+
+.research-link b,
+.research-link small {
+  display: block
+}
+
+.research-link b {
+  font-size: .96rem
+}
+
+.research-link small,
+.source-date {
+  color: var(--muted);
+  font-size: .78rem
+}
+
+.source-icon {
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 35px;
+  font-size: .93rem;
+  font-weight: 750
+}
+
+.reports-icon {
+  color: #3f57ae;
+  background: #eef0fb
+}
+
+.analog-icon {
+  color: #06755c;
+  background: #e3f2eb
+}
+
+.chevron {
+  color: #536784;
+  font-size: 1.3rem
+}
+
+.source-date {
+  margin: 1px 0 4px 42px
+}
+
+.source-date+.research-link {
+  border-top: 1px solid var(--line);
+  margin-top: 11px
+}
+
+.origin-note {
+  font-size: .8rem;
+  margin: 14px 1px
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px
+}
+
+.stat {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere
+}
+
+.stat strong {
+  font-size: 1.38rem
+}
+
+.stats+.note {
+  margin-bottom: 12px
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px
+}
+
+.scroll {
+  overflow: auto
+}
+
+.map {
+  width: 100%;
+  display: block
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .86rem;
+  text-align: left
+}
+
+.scroll th,
+.scroll td {
+  border-bottom: 1px solid #e5eaf0;
+  padding: 9px 10px
+}
+
+.scroll th {
+  color: var(--sub);
+  font-weight: 650;
+  background: #f5f7fb
+}
+
+.chips,
+.trace,
+.swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap
+}
+
+.chips .chosen {
+  color: #fff;
+  background: #3854a6
+}
+
+.trace {
+  margin: 10px 0
+}
+
+.trace span {
+  background: #eef2f8;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: .79rem
+}
+
+.report {
+  white-space: pre-wrap;
+  font: 1rem/1.65 "Georgia", serif;
+  max-height: 560px;
+  overflow: auto;
+  margin: 12px 0;
+  background: #fafbfd;
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-wrap: anywhere
+}
+
+details {
+  margin-top: 12px
+}
+
+summary {
+  font-size: .89rem;
+  color: #344b83;
+  font-weight: 600
+}
+
+.mono {
+  font: .8rem/1.5 "IBM Plex Mono", monospace;
+  overflow-wrap: anywhere
+}
+
+.memo,
+.receipt {
+  margin: 12px 0
+}
+
+.memo p {
+  margin: 2px 0;
+  color: var(--sub)
+}
+
+.measure {
+  max-width: 86ch
+}
+
+.button {
+  text-decoration: none;
+  display: inline-flex
+}
+
+.notice,
+.warning-strip {
+  padding: 10px 13px;
+  background: #fff5dd;
+  border: 1px solid #e7d19e;
+  border-radius: 7px;
+  color: #694708;
+  font-size: .87rem
+}
+
+.warning-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px
+}
+
+.warning-strip a {
+  color: #714b04;
+  white-space: nowrap
+}
+
+.swatches {
+  gap: 15px;
+  font-size: .82rem
+}
+
+.swatches span:before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  margin: 0 5px 3px 0;
+  border-top: 3px solid #4d68c8
+}
+
+.swatches .blue:before {
+  border-color: #828fa2;
+  border-top-style: dashed
+}
+
+.selector {
+  max-width: 100%;
+  min-width: 105px
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 110px 1fr 50px;
+  align-items: center;
+  gap: 7px;
+  font-size: .84rem;
+  margin: 5px 0
+}
+
+.bar i {
+  height: 8px;
+  background: #7286cd;
+  border-radius: 3px
+}
+
+.list {
+  padding-left: 20px;
+  color: var(--sub)
+}
+
+dialog {
+  max-width: min(96vw, 1400px);
+  max-height: 94vh;
+  border: 1px solid var(--line);
+  border-radius: 12px
+}
+
+dialog::backdrop {
+  background: #0f192bb3
+}
+
+.quality-row {
+  padding: 9px 0;
+  border-bottom: 1px solid #e5eaf0
+}
+
+.state {
+  font-size: .8rem;
+  font-weight: 650
+}
+
+.state.warn {
+  color: #956117
+}
+
+.state.bad {
+  color: #a43732
+}
+
+.state.ok {
+  color: #087264
+}
+
+.state.info {
+  color: #3963a1
+}
+
+nav button,
+.seg button,
+.textlink,
+.button {
+  transition: background .13s, color .13s
+}
+
+.skip {
+  position: absolute;
+  left: -10000px
+}
+
+.skip:focus {
+  left: 12px;
+  top: 8px;
+  background: white;
+  padding: 8px;
+  z-index: 5
+}
+
+@media(max-width:1090px) {
+  .shell {
+    grid-template-columns: 175px minmax(0, 1fr)
+  }
+
+  aside {
+    padding: 23px 9px
+  }
+
+  .overview-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(210px, 1fr)
+  }
+
+  .panel,
+  .position,
+  .stats {
+    padding: 16px
+  }
+
+  .kpi strong {
+    font-size: 1.53rem
+  }
+}
+
+@media(max-width:850px) {
+  .shell {
+    display: block
+  }
+
+  aside {
+    height: auto;
+    position: static;
+    padding: 10px 16px
+  }
+
+  .brand {
+    padding: 0 0 7px;
+    font-size: 1.02rem
+  }
+
+  .brand-mark {
+    width: 26px;
+    height: 26px;
+    padding: 5px
+  }
+
+  .brand small,
+  aside footer,
+  .nav-group {
+    display: none
+  }
+
+  nav {
+    display: flex;
+    gap: 3px;
+    overflow-x: auto
+  }
+
+  nav button {
+    white-space: nowrap;
+    font-size: .84rem;
+    padding: 7px 10px
+  }
+
+  nav button.on {
+    box-shadow: inset 0 -2px #91a8ff
+  }
+
+  .overview-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(215px, 1fr)
+  }
+}
+
+@media(max-width:660px) {
+  .top {
+    min-height: 55px
+  }
+
+  .top-left {
+    gap: 4px;
+    align-items: flex-start;
+    flex-direction: column
+  }
+
+  .overview-grid,
+  .split {
+    grid-template-columns: 1fr
+  }
+
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+    padding: 0
+  }
+
+  .kpi {
+    padding: 12px 14px
+  }
+
+  .kpi:nth-child(3) {
+    border-left: 0
+  }
+
+  .kpi:nth-child(n+3) {
+    border-top: 1px solid var(--line)
+  }
+
+  .kpi strong {
+    font-size: 1.57rem
+  }
+
+  .page-heading {
+    margin-top: 19px
+  }
+
+  .panel .row {
+    gap: 7px
+  }
+
+  .warning-strip {
+    align-items: flex-start;
+    flex-wrap: wrap
+  }
+
+  .brand small {
+    display: none
+  }
+
+  .page-heading p {
+    font-size: .87rem
+  }
+
+  .pos-number {
+    margin-top: 12px
+  }
+
+  .report {
+    padding: 10px
+  }
+
+  .stressrow {
+    gap: 5px
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  * {
+    transition: none !important
+  }
+}
+
+@media print {
+
+  aside,
+  .top,
+  .seg,
+  .file-button,
+  .textlink {
+    display: none
+  }
+
+  .shell,
+  main {
+    display: block;
+    max-width: none;
+    padding: 0
+  }
+
+  .panel,
+  .position,
+  .kpis {
+    break-inside: avoid
+  }
+
+  .position {
+    background: white;
+    color: var(--ink)
+  }
+
+  .position p,
+  .position dt,
+  .position .pos-number span {
+    color: var(--sub)
+  }
+}
+
+.quality-summary,
+.journal-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0 15px;
+  font-size: .86rem;
+  color: var(--sub)
+}
+
+.journal-shortcut {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 0 14px
+}
+
+.notice+.warning-strip {
+  margin-top: -3px
+}
+
+.study-update,
+.study-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0
+}
+
+.study-update {
+  background: #edf6f3;
+  border: 1px solid #c5e0d8;
+  border-radius: 7px;
+  padding: 12px 16px;
+  color: #174d43
+}
+
+.study-update span,
+.study-update strong {
+  display: block
+}
+
+.study-update span {
+  font-size: .9rem
+}
+
+.study-update a {
+  color: #155d50
+}
+
+.study-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px
+}
+
+.study-choices a {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--sub);
+  text-decoration: none
+}
+
+.study-choices a[aria-current="page"] {
+  background: #253e66;
+  border-color: #253e66;
+  color: white
+}
+
+.study-choices a:hover {
+  text-decoration: underline
+}
+
+#gdelt-dialog {
+  width: 96vw;
+  height: 92vh
+}
+
+#gdelt-dialog iframe {
+  width: 100%;
+  height: calc(100% - 44px);
+  border: 0
+}
+
+#gdelt-dialog .row {
+  margin-bottom: 8px
+}
+</style>
+</head>
+
+<body>
+  <dialog id="gdelt-dialog">
+    <div class="row">
+      <h2>GDELT research</h2><button onclick="this.closest('dialog').close()">Close</button>
+    </div><iframe title="Full GDELT research dashboard" sandbox="allow-scripts allow-downloads"></iframe>
+  </dialog>
+  <a class="skip" href="#view" onclick="document.querySelector('#view').focus(); return false;">Skip to
+    content</a>
+  <div class="shell">
+    <aside>
+      <a href="#overview" class="brand"><span class="brand-mark"
+          aria-hidden="true"><i></i><i></i><i></i></span><span>Hedge Desk<small>CMU
+            Capstone</small></span></a>
+      <nav aria-label="Portfolio workspace"></nav>
+      <footer>Portfolio research<br>CMU Agentic AI</footer>
+    </aside>
+    <main>
+      <div class="top">
+        <div class="top-left"><a class="textlink" href="index.html#overview">Current overview</a> <span
+            id="mode" class="mode"></span></div>
+        <div class="top-right"><span id="asof"></span><a id="worker-files" class="textlink" target="_blank"
+            rel="noreferrer">Worker sessions</a></div>
+      </div>
+      <article id="view" tabindex="-1"></article>
+    </main>
+  </div>
+  <dialog id="mapdialog">
+    <div class="row">
+      <h2>System map</h2>
+      <button onclick="this.closest('dialog').close()">Close</button>
+    </div>
+    <div class="scroll"><img class="map" alt="Full system architecture" id="largeMap" /></div>
+  </dialog>
+  <script id="run" type="application/json">@@RUN@@</script>
+  <script id="latest-study" type="application/json">@@LATEST_STUDY@@</script>
+  <script>
+"use strict";
+const d = JSON.parse(document.querySelector("#run").textContent),
+  latestStudy = JSON.parse(document.querySelector("#latest-study").textContent),
+  g = d.gdelt,
+  a = d.analysts,
+  m = d.decision,
+  b = d.tracker.current,
+  t = d.table;
+const sample = m.mode === "Scripted rehearsal",
+  closing = d.market.price_mode === "last_close_rehearsal",
+  control = m.mode === "Scripted close rehearsal",
+  mapSrc = "system.svg";
+const v = document.querySelector("#view"),
+  navGroups = {
+    Portfolio: {
+      overview: "Overview",
+      hedge: "Hedge decision",
+      portfolio: "Paper portfolio",
+      journal: "Decision journal"
+    },
+    Research: {
+      analysts: "Equity and Index Research Team",
+      gdelt: "GDELT analogs"
+    },
+    System: {
+      freshness: "Source freshness",
+      map: "System map"
+    },
+  };
+const selectedDates = new Map();
+let stock = a.find((s) => s.symbol === "AAPL").symbol,
+  group = "year",
+  receiptData = null,
+  inspected = null,
+  inspectSymbol = "AAPL",
+  packetError = "";
+// In displayed research, address assignments to the portfolio manager. Keep the signed report intact.
+function reportText(value) {
+  const name = d.report_contact;
+  if (!name || !/^[a-z]+$/i.test(name)) return value;
+  return String(value ?? "")
+    .replace(new RegExp("\\b([Ff]or|[Tt]o|[Aa]sk|[Bb]y) " + name + "\\b(?!\\s+[A-Z])", "g"),
+      "$1 the portfolio manager")
+    .replace(new RegExp("\\b" + name + "(?=[’']s\\b|\\*{0,2}\\s*[:,;/])", "g"), "Portfolio manager");
+}
+const esc = (x) =>
+  String(x ?? "—")
+  .replaceAll("Dated regular-hours close used for this rehearsal.",
+    "Recorded IBKR regular-session closing price.")
+  .replaceAll("Replay close", "Recorded close")
+  .replaceAll("the actual rehearsal time", "the time of the review")
+  .replaceAll("last-close rehearsal", "closing-price review")
+  .replaceAll("earlier rehearsal marks", "earlier closing marks")
+  .replaceAll("The rehearsal assumes a zero-spread paper fill",
+    "The paper ledger assumes a zero-spread fill")
+  .replace(
+    /[&<>"']/g,
+    (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[c],
+  );
+const num = (n, k = 0) =>
+  Number(n).toLocaleString("en-US", {
+    maximumFractionDigits: k,
+    minimumFractionDigits: k
+  });
+const money = (n, k = 0) =>
+  n == null ?
+  "—" :
+  Number(n).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: k,
+    minimumFractionDigits: k,
+  });
+const pct = (n) => (n == null ? "—" : (n > 0 ? "+" : "") + num(100 * n, 2) + "%");
+const signed = (n) => (n > 0 ? "+" + n : String(n));
+const et = (s) =>
+  s == null ?
+  "—" :
+  new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  }).format(new Date(s));
+const shortTime = (s) =>
+  new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(s));
+const panel = (s, cls = "") => '<section class="panel ' + cls + '">' + s + "</section>";
+const title = (h, p) => "<h1>" + esc(h) + '</h1><p class="intro">' + esc(p) + "</p>";
+const stat = (k, n, h) =>
+  '<div class="stat"><label>' +
+  esc(k) +
+  "</label><strong>" +
+  esc(n) +
+  "</strong><span>" +
+  esc(h) +
+  "</span></div>";
+const stats = (...rows) => '<div class="stats">' + rows.map((r) => stat(...r)).join("") + "</div>";
+const table = (heads, rows) =>
+  '<div class="scroll"><table><thead><tr>' +
+  heads.map((s) => "<th>" + esc(s) + "</th>").join("") +
+  "</tr></thead><tbody>" +
+  rows.map((row) => "<tr>" + row.map((c) => "<td>" + esc(c) + "</td>").join("") + "</tr>").join("") +
+  "</tbody></table></div>";
+const external = (url, label) => {
+  try {
+    if (!url) return "";
+    let u = new URL(url, location.href);
+    if (!["https:", "http:"].includes(u.protocol)) return "";
+    return (
+      '<a class="button" target="_blank" rel="noreferrer" href="' +
+      esc(u.href) +
+      '">' +
+      esc(label) +
+      "</a>"
+    );
+  } catch {
+    return "";
+  }
+};
+const details = (name, content) =>
+  "<details><summary>" + esc(name) + "</summary>" + content + "</details>";
+const memo = (name, text) =>
+  '<div class="memo"><h3>' + esc(name) + '</h3><p class="measure">' + esc(text) + "</p></div>";
+const keep = m.current_contracts,
+  target = m.target_contracts,
+  delta = m.change_contracts,
+  hist = d.tracker.points;
+
+function chart(lines, labels, formatter, ylabel, times = null) {
+  const W = 700,
+    H = 230,
+    L = 83,
+    R = 24,
+    T = 16,
+    B = 37,
+    colors = ["#4d68c8", "#8998ab"];
+  let vals = lines
+    .flat()
+    .filter((x) => x != null && Number.isFinite(+x))
+    .map(Number);
+  if (!vals.length) return '<p class="empty">No path values supplied.</p>';
+  let lo = Math.min(...vals),
+    hi = Math.max(...vals);
+  if (lo === hi) {
+    let p = Math.abs(lo) * 0.002 || 0.01;
+    lo -= p;
+    hi += p;
+  } else {
+    let p = (hi - lo) * 0.09;
+    lo -= p;
+    hi += p;
+  }
+  const elapsed = times && times.at(-1) - times[0],
+    X = (i) => L + (W - L - R) * (elapsed > 0 ? (times[i] - times[0]) / elapsed : i / Math.max(1, labels
+      .length - 1)),
+    Y = (n) => T + ((hi - n) * (H - T - B)) / (hi - lo);
+  let svg =
+    '<svg viewBox="0 0 700 230" role="img" aria-label="' +
+    esc(ylabel) +
+    '"><title>' +
+    esc(ylabel) +
+    "</title>";
+  for (let i = 0; i <= 4; i++) {
+    let n = lo + ((hi - lo) * i) / 4,
+      y = Y(n);
+    svg +=
+      '<path d="M' +
+      L +
+      " " +
+      y +
+      "H" +
+      (W - R) +
+      '" stroke="#dde4df"/><text x="' +
+      (L - 7) +
+      '" y="' +
+      (y + 4) +
+      '" text-anchor="end" fill="#455e61" font-size="12">' +
+      esc(formatter(n)) +
+      "</text>";
+  }
+  const mid = Math.floor((labels.length - 1) / 2),
+    last = labels.length - 1;
+  for (const i of new Set([0, ...(X(mid) - X(0) > 100 && X(last) - X(mid) > 100 ? [mid] : []), last]))
+    svg +=
+    '<text text-anchor="' +
+    (i === 0 ? "start" : i === labels.length - 1 ? "end" : "middle") +
+    '" x="' +
+    X(i) +
+    '" y="218" fill="#455e61" font-size="12">' +
+    esc(labels[i]) +
+    "</text>";
+  lines.forEach((line, j) => {
+    let prev = false,
+      path = "";
+    line.forEach((p, i) => {
+      if (p == null) {
+        prev = false;
+        return;
+      }
+      path += (prev ? "L" : "M") + X(i) + " " + Y(p);
+      prev = true;
+    });
+    svg +=
+      '<path d="' +
+      path +
+      '" fill="none" stroke="' +
+      colors[j] +
+      '" stroke-width="3" ' +
+      (j ? 'stroke-dasharray="7 4"' : "") +
+      "/>";
+    let k = line.findLastIndex((x) => x != null);
+    if (k >= 0)
+      svg += '<circle cx="' + X(k) + '" cy="' + Y(line[k]) + '" r="3.5" fill="' + colors[j] + '"/>';
+  });
+  return '<div class="figure">' + svg + "</svg></div>";
+}
+
+function mapPage() {
+  return (
+    title(
+      "Portfolio hedge system",
+      "Follow a trading session from research publication through a signed futures decision and the simulated portfolio record.",
+    ) +
+    stats(
+      [
+        "Analyst subjects",
+        a.length + " / 7",
+        closing ? d.analyst_publication : sample ? "Illustrative daily packet" :
+        "Accepted daily reports",
+      ],
+      [
+        "GDELT cohort",
+        g ? num(g.queries) : "Unavailable",
+        g ?
+        g.synthetic ?
+        "Synthetic retrieval fixture" :
+        "Saved historical study" :
+        "Coverage gap recorded",
+      ],
+      [
+        "MES overlay",
+        signed(keep) + " → " + signed(target),
+        sample || control ? "Scripted paper example" : "Advisory target",
+      ],
+    ) +
+    panel(
+      '<div class="row"><h2>System architecture</h2><button id="expand">Enlarge diagram</button></div><img class="map" src="' +
+      mapSrc +
+      '" alt="The Equity and Index Research Team uses IBKR reference prices. The hedge worker requests its own IBKR marks and combines them with the analyst reports, GDELT analogs and simulated positions.">',
+      "mapbox",
+    ) +
+    (!sample && !control ? panel('<div class="row"><h2>Worker dashboard</h2>' + external(d.links
+        ?.workerDashboard, "Open latest worker dashboard") +
+      '</div><p class="note">The updated Google worker publishes this private file after each completed review or forward observation. It becomes available with the first dashboard deployment. The worker sessions folder also contains the original dated runs.</p>'
+      ) : "") +
+    '<p class="note">' +
+    (closing ? esc("IBKR closing bars for " + d.market.session_date + ". " + d.market
+        .simulation_assumption) : sample ?
+      "The GDELT tab identifies its source. The analyst forecasts, prices, decision and subsequent fills in this walkthrough are illustrative." :
+      "Each view uses the archived decision-time inputs. The recommendation is separate from the ledger’s fills."
+      ) +
+    "</p>"
+  );
+}
+
+function analystPage() {
+  let s = a.find((x) => x.symbol === stock),
+    f = s.forecast,
+    mark = s.mark.last,
+    ref = f.reference_price;
+  return (
+    title(
+      "Equity and Index Research Team",
+      "Four specialists examine each subject. A forecast writer drafts the assessment, a critic challenges it, and a final writer publishes the report.",
+    ) +
+    panel(
+      '<div class="row"><h2>Daily batch</h2>' +
+      external(
+        d.links?.researchDashboard,
+        "Analyst dashboard",
+      ) +
+      '</div><p class="note">' +
+      esc(closing ? d.analyst_publication : sample ? "Synthetic packet" : "Verified packet") +
+      " · " +
+      esc(d.batch_date) +
+      " · " +
+      esc(d.analyst_run) +
+      (d.dashboard ? " · " + external(d.links?.researchDashboard && d.links.researchDashboard.replace(
+          /\/$/, "") + "/static/verify-daily.html?date=" + encodeURIComponent(d.batch_date),
+        "Verify dated publication") : "") +
+      '</p><div class="trace"><span>Business</span><span>Valuation</span><span>Catalysts</span><span>Geoeconomics</span> → <span>Draft</span> → <span>Critic</span> → <span>Final report</span></div><p class="note">Sol 6.2 runs the specialists, the draft and the two evidence searches. Astra 6.2 handles critique and final writing.</p>',
+    ) +
+    panel(
+      '<div class="row"><h2>Published assessments</h2><div class="chips">' +
+      a
+      .map(
+        (x) =>
+        '<button data-stock="' +
+        esc(x.symbol) +
+        '" aria-pressed="' +
+        (x.symbol === stock) +
+        '" class="' +
+        (x.symbol === stock ? "chosen" : "") +
+        '">' +
+        esc(x.symbol) +
+        "</button>",
+      )
+      .join("") +
+      "</div></div>" +
+      stats(
+        ["Reference", ref == null ? "—" : num(ref, 2), f.price_date || "No dated reference"],
+        [
+          "Forecast endpoint",
+          f.status === "abstain" ? "Abstain" : num(f.expected_end_price, 2),
+          f.status === "abstain" ?
+          "Reason stated in report" :
+          pct(f.expected_return) + " over " + (f.horizon_sessions || 20) + " sessions",
+        ],
+        [
+          closing ? "IBKR close · " + d.market.session_date : "Decision-time mark",
+          num(mark, 2),
+          ref > 0 ? pct(mark / ref - 1) + " from reference" : "No comparable reference",
+        ],
+      ) +
+      '<p class="note">' +
+      esc(s.symbol === "SP500" ? "Index points" : "USD per share") +
+      " · Cutoff " +
+      esc(et(f.information_cutoff)) +
+      " · Issued " +
+      esc(et(f.issued_at)) +
+      " · Horizon " +
+      esc(f.horizon_end ?? "unspecified") +
+      "</p>" +
+      (f.status === "abstain" ? '<p class="notice">' + esc(reportText(f.reason)) + "</p>" : "") +
+      '<div class="report">' +
+      esc(reportText(s.report)) +
+      "</div>" +
+      details(
+        "Report provenance",
+        '<p class="mono">' +
+        esc(f.forecast_id) +
+        "<br>" +
+        esc(s.key) +
+        "<br>SHA-256 " +
+        esc(s.sha) +
+        "</p>",
+      ),
+    ) +
+    panel(
+      '<h2>Inspect a producer receipt</h2><p class="note">Open the dated status.json to see the saved progress. For a completed run, add portfolio-research.json to verify the checksum and read the seven final reports. Files are inspected locally. The archived hedge decision keeps its original inputs.</p><input type="file" id="receipt" accept=".json,application/json" aria-label="Open analyst status JSON"><div id="receiptResult" aria-live="polite"></div>',
+    )
+  );
+}
+
+function showReceipt() {
+  let el = document.querySelector("#receiptResult");
+  if (!el || !receiptData) return;
+  let r = receiptData;
+  if (r.error) {
+    el.textContent = r.error;
+    return;
+  }
+  el.innerHTML =
+    '<div class="receipt"><strong>' +
+    esc(r.session_date) +
+    " · " +
+    esc(r.status) +
+    '</strong><p class="mono">' +
+    esc(r.run_id) +
+    " · updated " +
+    esc(r.updated_at) +
+    "</p>" +
+    table(
+      ["Subject", "Stage", "Detail"],
+      Object.entries(r.subjects).map(([k, s]) => [k, s.status, s.detail ?? s.last_stage ?? "—"]),
+    ) +
+    (r.status === "completed" && r.accepted === 7 ?
+      '<p><label>Inspect the matching portfolio packet <input type="file" id="realPacket" accept=".json,application/json"></label></p>' :
+      "") +
+    (packetError ? '<p class="notice">' + esc(packetError) + "</p>" : "") +
+    (inspected ?
+      '<h3>Verified research packet</h3><p class="mono">' +
+      esc(r.packet_sha256) +
+      '</p><select id="inspectSymbol" class="selector" aria-label="Inspect verified subject">' +
+      Object.keys(inspected.subjects)
+      .sort()
+      .map((k) => "<option " + (k === inspectSymbol ? "selected" : "") + ">" + esc(k) + "</option>")
+      .join("") +
+      '</select><p class="note">' +
+      esc(inspected.subjects[inspectSymbol].forecast.forecast_id) +
+      " · cutoff " +
+      esc(et(inspected.subjects[inspectSymbol].forecast.information_cutoff)) +
+      '</p><div class="report">' +
+      esc(reportText(inspected.subjects[inspectSymbol].report_markdown)) +
+      "</div>" :
+      "") +
+    "</div>";
+}
+async function inspectPacket(file, r) {
+  if (!window.crypto?.subtle)
+    throw Error("Open this HTML locally in a browser that supports SHA-256 verification.");
+  const hash = async (b) =>
+    Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", b)), (v) =>
+      v.toString(16).padStart(2, "0"),
+    ).join("");
+  const bytes = await file.arrayBuffer();
+  if ((await hash(bytes)) !== r.packet_sha256)
+    throw Error("Packet checksum differs from the selected receipt.");
+  const p = JSON.parse(new TextDecoder("utf-8", {
+    fatal: true
+  }).decode(bytes));
+  const keys = Object.keys(p.subjects).sort();
+  if (
+    p.run_id !== r.run_id ||
+    p.fleet.test_id !== r.run_id ||
+    p.session_date !== r.session_date ||
+    p.source_revision !== r.source_revision ||
+    p.schema !== "portfolio-research-v1" ||
+    p.all_reports_available !== true ||
+    p.hourly_monitoring !== false ||
+    p.execute !== false ||
+    r.packet_key !== "portfolio-research/" + p.run_id + ".json" ||
+    keys.join() !==
+    a
+    .map((x) => x.symbol)
+    .sort()
+    .join()
+  )
+    throw Error("The packet does not match this seven-subject batch.");
+  for (const k of keys) {
+    const item = p.subjects[k];
+    if (
+      item.symbol !== k ||
+      item.forecast.symbol !== k ||
+      item.status !== "available" ||
+      !item.forecast.forecast_id ||
+      !item.report_markdown?.trim() ||
+      (await hash(new TextEncoder().encode(item.report_markdown))) !== item.report_sha256
+    )
+      throw Error("Report verification failed for " + k);
+  }
+  return p;
+}
+
+function gdeltPage(study) {
+  const decisionStudy = study === g;
+  const choice = (key, text, selected) =>
+    '<a href="#' + key + '"' + (selected ? ' aria-current="page"' : '') + '>' + esc(text) + '</a>';
+  const choices = '<div class="study-choices" role="group" aria-label="GDELT study">' +
+    choice("gdelt", "Nov 22 · Latest study", !decisionStudy) +
+    choice("gdelt-decision", "Nov 16 · Friday hedge input", decisionStudy) + '</div>';
+  if (!study)
+    return (
+      title("GDELT historical analogs", "Historical research was unavailable for this decision.") +
+      choices + panel("<h2>Coverage gap</h2><p>" + esc(d.gdelt_gap) + "</p>")
+    );
+  const explorer = decisionStudy ? d.gdelt_url : study.explorer;
+  let openResearch;
+  if (study.producer_page) {
+    openResearch = '<button id="open-gdelt">Open full research</button>';
+  } else if (explorer === "gdelt/index.html" || explorer === latestStudy.explorer) {
+    openResearch = '<a class="button" target="_blank" rel="noopener noreferrer" href="' + esc(explorer) +
+      '">Open full research</a>';
+  } else {
+    openResearch = external(explorer || d.links?.gdeltSource,
+      explorer ? "Open full research" : "GDELT source code");
+  }
+  const row = study.dates.find(r => r.day === selectedDates.get(study.run)) || study.dates[0];
+  let counts = {};
+  for (let r of study.dates) {
+    let k = r.day.slice(0, group === "year" ? 4 : group === "month" ? 7 : 10);
+    counts[k] = (counts[k] || 0) + r.votes;
+  }
+  let sorted = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 8);
+  let picker =
+    '<select id="datepick" class="selector widepick" aria-label="Historical match date">' +
+    study.dates
+    .map(
+      (r) =>
+      '<option value="' +
+      esc(r.day) +
+      '" ' +
+      (r.day === row.day ? "selected" : "") +
+      ">" +
+      esc(r.day) +
+      " · " +
+      num(r.votes, 2) +
+      " votes" +
+      (r.note ? " · reader reviewed" : "") +
+      "</option>",
+    )
+    .join("") +
+    "</select>";
+  return (
+    title("GDELT historical analogs", decisionStudy ?
+      "November 16 research used for the Friday, November 20 paper hedge." :
+      "Sunday, November 22 research, completed after Friday’s paper hedge.") +
+    '<div class="study-toolbar">' + choices + openResearch + '</div>' +
+    (decisionStudy && warnings.some(row => row.group === "GDELT") ? freshnessBanner() : "") +
+    stats(
+      ["Selected stories", num(study.queries), study.synthetic ? "Synthetic cohort" :
+        "Saved one-hour cohort"
+      ],
+      ["Historical corpus", num(study.corpus), "Filtered news documents"],
+      ["Matched dates", num(study.dates.length), num(study.weight) + " total votes"],
+    ) +
+    '<p class="note">' +
+    (study.synthetic ? "Synthetic study" : "Saved GDELT study") +
+    " · " +
+    esc(et(study.window.start)) +
+    " to " +
+    esc(et(study.window.end)) +
+    " · " +
+    esc(study.run) +
+    "</p>" +
+    panel("<h2>" + esc(study.headline || "Research assessment") + "</h2>" + details(
+      "Read the assessment", "<p>" + esc(study.assessment) + "</p>")) +
+    panel(
+      '<div class="row"><h2>Historical S&P 500 return paths</h2>' +
+      picker +
+      '</div><p class="note">Change the date to compare its path with the vote-weighted mean. T0 is the market anchor close.</p>' +
+      '<div class="swatches"><span>Selected date</span><span class="blue">Weighted mean</span></div>' +
+      chart(
+        [row.path, study.mean],
+        study.mean.map((_, i) => "T" + i),
+        pct,
+        "Historical cumulative price return",
+      ) +
+      '<p class="note">Anchor ' +
+      esc(row.anchor) +
+      " · T20 " +
+      esc(row.end) +
+      " · Selected date " +
+      pct(row.path.at(-1)) +
+      " · Weighted mean " +
+      pct(study.mean.at(-1)) +
+      "</p>",
+    ) +
+    '<div class="split">' +
+    panel(
+      '<div class="row"><h2>Historical votes</h2><select class="selector" id="group" aria-label="Group votes">' +
+      ["year", "month", "day"]
+      .map((x) => "<option " + (x === group ? "selected" : "") + ">" + x + "</option>")
+      .join("") +
+      '</select></div><p class="note">Largest ' +
+      Math.min(8, sorted.length) +
+      " bins by vote mass</p>" +
+      sorted
+      .map(
+        (x) =>
+        '<div class="bar"><span>' +
+        esc(x[0]) +
+        '</span><i style="width:' +
+        (100 * x[1]) / sorted[0][1] +
+        '%"></i><span>' +
+        num(x[1], 2) +
+        "</span></div>",
+      )
+      .join(""),
+    ) +
+    panel(
+      "<h2>Evidence for " +
+      esc(row.day) +
+      "</h2>" +
+      memo("Current headline", row.query || "No representative in the displayed fused matches.") +
+      memo("Historical headline", row.match || "No representative in the displayed fused matches.") +
+      (row.note ?
+        memo("Reader assessment", row.note.assessment) +
+        memo("Important difference", row.note.differences?.[0] ?? "No difference supplied.") :
+        '<p class="note">This date has no separate reader annotation.</p>'),
+    ) +
+    "</div>" +
+    panel(
+      '<h2>Scope of the comparison</h2><ul class="list">' +
+      study.limitations
+      .slice(0, 4)
+      .map((x) => "<li>" + esc(x) + "</li>")
+      .join("") +
+      "</ul>",
+    )
+  );
+}
+
+function hedgePage() {
+  return (
+    title("Hedge decision", m.rationale) +
+    (m.position_review_required ?
+      '<p class="notice">Existing position is outside the supplied limits. Human review requested.</p>' :
+      "") +
+    stats(
+      ["Current MES", signed(keep), t.contract],
+      ["Target MES", signed(target), "Signed ending position"],
+      [
+        "Change",
+        signed(delta),
+        m.action === "adjust" ?
+        (delta < 0 ? "Sell" : "Buy") +
+        " " +
+        Math.abs(delta) +
+        " contract" +
+        (Math.abs(delta) === 1 ? "" : "s") :
+        m.action,
+      ],
+    ) +
+    '<p class="note">' +
+    esc(
+      control ? "Scripted target selected to exercise the paper ledger" : sample ?
+      "Scripted decision · Astra request path exercised with a test response" :
+      m.model + " · " + m.reasoning_effort + " reasoning",
+    ) +
+    " · " +
+    esc(m.horizon || "Decision horizon in the original memo") +
+    "</p>" +
+    panel(m.partial_memo ?
+      "<h2>Worker record</h2><p>The recorded rationale above comes from Friday’s worker output. The archived original contains the complete memo.</p>" +
+      external(d.original_url, "Open original worker session") : control ?
+      "<h2>Paper accounting check</h2>" +
+      memo("Price source", "Eight IBKR closing bars for " + d.market.session_date +
+        ". The simulator values the futures position with the " + t.contract + " contract’s own bar."
+        ) +
+      memo("Result", "The hedged book differs from the same unhedged stock basket by " +
+        money(b.hedge_after_fees_usd, 2) + " after fees. The Paper portfolio tab shows the receipt.") +
+      memo("Research available", d.analyst_publication + " from " + d.batch_date +
+        " and the saved GDELT study. A model review uses the same closing-price input.") :
+      "<h2>Investment memo</h2>" +
+      memo("Market outlook", m.market_view) +
+      memo("Held basket", m.basket_view) +
+      memo("Since the analyst cutoffs", m.price_interpretation) +
+      memo("How the evidence was weighed", m.evidence_weight) +
+      memo("Strongest contrary case", m.countercase) +
+      memo("Reconsider if", m.reconsider_if),
+      "accent",
+    ) +
+    panel(
+      '<h2>Alternatives at the decision time</h2><p class="note">Dollar difference versus keeping ' +
+      signed(keep) +
+      " MES, after the assumed one-way cost of " +
+      money(d.policy.cost_per_contract_usd, 2) +
+      " per contract changed.</p>" +
+      table(
+        [
+          "End MES",
+          "Change",
+          "Net beta",
+          "Rally " + pct(d.policy.scenarios.rally.index_return),
+          "Flat " + pct(d.policy.scenarios.flat.index_return),
+          "Decline " + pct(d.policy.scenarios.decline.index_return),
+        ],
+        t.candidates.map((x) => [
+          signed(x.target_contracts) + (x.target_contracts === target ? " · chosen" : ""),
+          signed(x.change_contracts),
+          x.net_beta == null ? "—" : num(x.net_beta, 3),
+          ...["rally", "flat", "decline"].map((y) => money(x.scenarios[y].versus_keep_usd, 2)),
+        ]),
+      ) +
+      '<p class="note">Betas ' +
+      esc(d.policy.beta_source || "unavailable unless supplied by the operator") +
+      ".</p>",
+    ) +
+    panel(
+      "<h2>Decision evidence</h2>" +
+      (m.calculator_calls?.length ? details("Astra calculator calls (" + m.calculator_calls.length +
+          ")", m.calculator_calls.map(call =>
+            memo("Requested what-if", call.arguments) + (call.result.error ? memo("Validation", call
+                .result.error) :
+              table(["MES target", "Net beta", "Change fee", "What-if total P&L"], call.result
+                .candidates.map(row => [signed(row.target_contracts), formatBeta(row.net_beta), money(
+                  row.change_cost_usd, 2), money(row.scenarios.what_if.total_pnl_usd, 2)])))).join("")
+          ) :
+        '<p class="note">The worker computed the standard alternatives before Astra reviewed them.</p>'
+        ) +
+      "<p>" +
+      esc(m.partial_memo ?
+        "The verified packet contains seven forecasts. The original memo records Astra’s individual citations." :
+        (m.forecast_ids || []).join(" · ")) +
+      '</p><p class="mono">GDELT ' +
+      esc(g?.run || d.gdelt_gap) +
+      "</p>" +
+      details(
+        "View input fingerprints",
+        '<p class="mono">Analyst packet ' +
+        esc(d.hashes.analysts) +
+        "<br>GDELT handoff " +
+        esc(d.hashes.gdelt) +
+        (closing ? "<br>IBKR closing bars " + esc(d.market.capture_sha256) : "") +
+        "<br>Prompt " +
+        esc(m.prompt_sha256) +
+        "<br>Response " +
+        esc(control ? "Scripted control" : m.response_id) +
+        "</p>",
+      ) +
+      table(
+        closing ? ["Instrument", "Closing price / points", "From previous close", "Session"] : [
+          "Quote", "Price / points", "Observation (ET)", "Feed"
+        ],
+        Object.entries(d.market.quotes).map(([k, q]) => [
+          k,
+          num(q.last, 2),
+          closing ? (q.prior_close > 0 ? pct(q.last / q.prior_close - 1) : "—") : et(q.observed_at),
+          closing ? q.session_date : d.market.synthetic ? "Synthetic" : q.mode,
+        ]),
+      ),
+    )
+  );
+}
+
+function bookPage() {
+  return (
+    title(
+      "Paper portfolio",
+      "The same stock quantities and cash form the unhedged comparison. Simulated MES gains, losses and fees explain the difference between the two books.",
+    ) +
+    stats(
+      ["Hedged NAV", money(b.portfolio_value_usd, 2), "As of " + shortTime(b.as_of)],
+      ["Unhedged NAV", money(b.unhedged_value_usd, 2), "Same shares and income"],
+      [
+        "Overlay after fees",
+        money(b.hedge_after_fees_usd, 2),
+        money(b.fees_usd, 2) + " cumulative fees",
+      ],
+    ) +
+    panel(
+      '<h2>Portfolio value over time</h2><div class="swatches spaced"><span>Hedged book</span><span class="blue">Unhedged comparison</span></div>' +
+      chart(
+        [hist.map((x) => x.portfolio_value_usd), hist.map((x) => x.unhedged_value_usd)],
+        hist.map((x) => shortTime(x.as_of)),
+        (n) => money(n),
+        "Simulated portfolio values in USD",
+      ) +
+      '<p class="note">' +
+      (closing ?
+        "When the hedge changes, the paper ledger records a fill at the MES closing price and applies the displayed fee." :
+        sample ?
+        "The later marks and fill demonstrate the ledger arithmetic. They are synthetic and do not measure strategy performance." :
+        "Snapshots reflect the stored simulation journal.") +
+      "</p>",
+    ) +
+    panel(
+      "<h2>Holdings & cash</h2>" +
+      table(
+        ["Instrument", "Quantity", "Mark", "Value / open P&L"],
+        [
+          ...Object.entries(b.equities).map(([k, p]) => [
+            k,
+            num(p.shares),
+            money(p.mark, 2),
+            money(p.value_usd, 2),
+          ]),
+          ...Object.entries(b.futures).map(([k, p]) => [
+            k,
+            signed(p.contracts),
+            num(p.mark, 2) + " pts",
+            money(p.unrealized_usd, 2) + " P&L",
+          ]),
+          ["Cash", "—", "—", money(b.cash_usd, 2)],
+        ],
+      ),
+    ) +
+    panel(
+      "<h2>Simulated decision journal</h2>" +
+      (d.tracker.decisions.length ?
+        table(
+          ["Decision time", "Receipt", "Contract", "Signed change", "Fill", "Fee"],
+          d.tracker.decisions.map((e) => [
+            et(e.at),
+            e.receipt.status,
+            e.contract ?? "—",
+            e.contracts == null ? "—" : signed(e.contracts),
+            e.receipt.fill_price ?? "—",
+            e.fee_usd == null ? "—" : money(e.fee_usd, 2),
+          ]),
+        ) :
+        '<p class="empty">No simulated trade decisions recorded.</p>') +
+      '<p class="note">' +
+      esc(b.opening_assumption) +
+      "</p>",
+    )
+  );
+}
+const metricNumber = value => value == null || value === "" || !Number.isFinite(Number(value)) ? null :
+  Number(value);
+const positionName = n => n == null ? "Unavailable" : n === 0 ? "Flat" :
+  `${Math.abs(n)} ${n < 0 ? "short" : "long"}`;
+const signedMoney = (n, places = 2) => n == null ? "—" : (n > 0 ? "+" : "") + money(n, places);
+const returnFrom = (value, start) => start > 0 && value != null ? Number(value) / start - 1 : null;
+const booked = b.futures[t.contract]?.contracts ?? 0;
+const nav = metricNumber(b.portfolio_value_usd),
+  benchmark = metricNumber(b.unhedged_value_usd);
+const startNav = metricNumber(b.opening_value_usd),
+  effect = metricNumber(b.hedge_after_fees_usd);
+const multiplier = Number(d.policy.future.multiplier);
+const unit = metricNumber(t.mes_unit_notional_usd);
+const otherOverlay = Object.entries(b.futures).filter(([contract]) => contract !== t.contract)
+  .reduce((sum, [, leg]) => sum + leg.contracts * Number(leg.mark) * multiplier, 0);
+const anchor = t.candidates.find(row => metricNumber(row.net_beta) !== null);
+const decisionNav = metricNumber(t.valuation_nav_usd);
+const equityBeta = anchor && decisionNav > 0 && unit > 0 ?
+  anchor.net_beta - (anchor.target_contracts * unit + otherOverlay) / decisionNav : null;
+const bookedBeta = equityBeta == null ? null : equityBeta + (booked * unit + otherOverlay) / decisionNav;
+const proposed = t.candidates.find(row => row.target_contracts === target);
+const scenarioNames = ["decline", "flat", "rally"].filter(name => proposed?.scenarios?.[name]);
+let compareMode = "difference",
+  performanceMode = "returns";
+const calendarDay = s => new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  })
+  .format(new Date(s + "T12:00:00Z"));
+const linkPage = (key, text) => `<a class="textlink" href="#${key}">${esc(text)}</a>`;
+const kpi = (label, value, hint, color = "") =>
+  `<div class="kpi"><span>${esc(label)}</span><strong class="${color}">${esc(value)}</strong><small>${esc(hint)}</small></div>`;
+const formatBeta = beta => beta == null ? "—" : num(beta, 3);
+const segment = (name, options, selected) => `<div class="seg" role="group" aria-label="${esc(name)}">` +
+  options.map(([key, label]) =>
+    `<button data-switch="${key}" aria-pressed="${key === selected}">${esc(label)}</button>`).join("") +
+  "</div>";
+
+function stressPanel() {
+  if (!proposed || !scenarioNames.length) return panel(
+    "<h2>Decision scenarios</h2><p>Scenario estimates are unavailable for this run.</p>");
+  const rows = scenarioNames.map(key => {
+    const scenario = proposed.scenarios[key],
+      total = metricNumber(scenario.total_pnl_usd),
+      overlay = metricNumber(scenario.overlay_after_cost_usd);
+    return {
+      key,
+      label: {
+        decline: "Market decline",
+        flat: "Flat market",
+        rally: "Market rally"
+      } [key],
+      market: d.policy.scenarios[key].index_return,
+      total,
+      overlay,
+      base: total == null || overlay == null ? null : total - overlay
+    };
+  });
+  const relative = compareMode === "difference";
+  const scale = Math.max(1, ...rows.flatMap(r => relative ? [Math.abs(r.overlay ?? 0)] : [Math.abs(r
+    .total ?? 0), Math.abs(r.base ?? 0)]));
+
+  function bar(n, cls) {
+    if (n == null) return "";
+    const width = Math.abs(n) / scale * 48;
+    return `<i class="trackbar ${cls}" style="${n < 0 ? "right" : "left"}:50%;width:${width}%"></i>`
+  }
+  const marks = rows.map(r =>
+    `<div class="stressrow"><div><strong>${esc(r.label)}</strong><small>S&amp;P 500 ${esc(pct(r.market))}</small></div>` +
+    `<div class="track ${relative?"single":"paired"}" aria-hidden="true"><i class="zero"></i>` +
+    (relative ? bar(r.overlay, r.overlay >= 0 ? "gain" : "cost") : bar(r.base, "unhedged") + bar(r
+      .total, "selected")) +
+    `</div><div class="amount">${relative?signedMoney(r.overlay):signedMoney(r.total)}${relative?"":`<small>${signedMoney(r.base)}</small>`}</div></div>`
+    ).join("");
+  return panel(
+    `<div class="row"><h2>Decision scenarios</h2>${segment("Scenario display",[["difference","Difference"],["totals","Total P&L"]],compareMode)}</div>` +
+    `<p class="note">Modeled at the decision marks for the ${esc(positionName(target).toLowerCase())} MES target, including its change fee.</p>` +
+    `<div class="stressgraph">${marks}</div>` +
+    (relative ?
+      '<div class="legend"><i class="dot gain"></i>Protection gained<i class="dot cost"></i>Upside or fee cost</div>' :
+      '<div class="legend"><i class="dot selected"></i>Target portfolio<i class="dot unhedged"></i>Unhedged portfolio</div>'
+      ));
+}
+
+function exposureCard() {
+  const bookedNotional = booked * unit,
+    value = b.futures[t.contract]?.mark ?? d.market.quotes[t.contract]?.last;
+  const contractMonth = d.policy.future.contract_month;
+  const expiry = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(contractMonth.slice(0, 4) + "-" + contractMonth.slice(4) + "-01T12:00:00Z"));
+  const targetNote = target !== booked ? `Astra target: ${positionName(target).toLowerCase()}.` : "";
+  return `<section class="position"><div class="pos-head"><h2>Current hedge</h2><span class="paper-tag">Paper book</span></div>` +
+    `<div class="pos-number">${esc(positionName(booked))}<span> MES</span></div><p>Micro E-mini S&amp;P 500 · ${esc(expiry)}</p>` +
+    `<dl><div><dt>Signed exposure</dt><dd>${signedMoney(bookedNotional,0)}</dd></div><div><dt>Contract mark</dt><dd>${num(value,2)} pts</dd></div></dl>` +
+    `<div class="pos-foot"><span>${esc(targetNote || (m.action === "defer" ? "Decision deferred" : "Recorded position"))}</span>${linkPage("hedge","View decision")}</div></section>`;
+}
+
+function performancePanel() {
+  const returns = performanceMode === "returns",
+    chartValues = k => hist.map(pt => returns ? returnFrom(pt[k], startNav) : metricNumber(pt[k]));
+  const labels = hist.map(pt => shortTime(pt.as_of));
+  const hedgeReturn = returnFrom(nav, startNav),
+    baseReturn = returnFrom(benchmark, startNav);
+  const values = chart([chartValues("portfolio_value_usd"), chartValues("unhedged_value_usd")], labels,
+    returns ? pct : n => money(n, 0), returns ? "Hedged and unhedged paper returns since opening" :
+    "Hedged and unhedged paper NAV", hist.map(pt => Date.parse(pt.as_of)));
+  const fill = d.tracker.decisions.filter(e => e.receipt?.status === "filled" && e.contract === t
+    .contract).at(-1);
+  const lastMark = b.futures[t.contract]?.marked_at;
+  const noLaterMark = fill && lastMark && Date.parse(lastMark) <= Date.parse(fill.at);
+  return panel(
+    `<div class="row"><h2>Portfolio performance</h2>${segment("Performance display",[["returns","Return"],["value","NAV"]],performanceMode)}</div>` +
+    `<div class="perf-legend"><span><i class="dot selected"></i>Hedged book <strong>${returns?pct(hedgeReturn):money(nav,2)}</strong></span>` +
+    `<span><i class="dot unhedged"></i>Unhedged book <strong>${returns?pct(baseReturn):money(benchmark,2)}</strong></span></div>` +
+    values +
+    `<p class="note">${noLaterMark?"Latest paper valuation is at the fill. The journal has no subsequent MES mark yet. ":""}Lines connect recorded valuations of the same equity holdings and starting cash. Performance includes paper fills and fees.</p>`
+    );
+}
+
+function intelligenceCard() {
+  const F = a.map(s => s.forecast);
+  const estimates = F.filter(f => f.status === "estimate").length;
+  let latest = F.map(f => f.information_cutoff).filter(Boolean).sort().at(-1);
+  return `<section class="panel research-hub"><h2>Research behind the hedge</h2>` +
+    `<a class="research-link" href="#analysts"><span class="source-icon reports-icon" aria-hidden="true">A</span><span><b>Equity and Index Research Team</b><small>${a.length} reports · ${estimates} estimates</small></span><span class="chevron" aria-hidden="true">›</span></a>` +
+    `<p class="source-date">${latest?"Latest cutoff "+esc(et(latest)):"Cutoff unavailable"}</p>` +
+    `<a class="research-link" href="#gdelt-decision"><span class="source-icon analog-icon" aria-hidden="true">G</span><span><b>GDELT input to Friday’s hedge</b><small>${g?num(g.queries)+" stories · "+num(g.corpus)+" in history":"Coverage gap"}</small></span><span class="chevron" aria-hidden="true">›</span></a>` +
+    `<p class="source-date">${g?"Cohort "+esc(et(g.window.start)):esc(d.gdelt_gap)}</p></section>`;
+}
+
+function overviewPage() {
+  const asof = d.session_date || d.market.session_date || d.batch_date;
+  const betaChange = bookedBeta == null ? "Estimate unavailable" : "Change " + (bookedBeta - equityBeta >
+    0 ? "+" : "") + num(bookedBeta - equityBeta, 3);
+  const effectBps = effect == null || !(startNav > 0) ? null : 10000 * effect / startNav;
+  return `<header class="page-heading"><h1>Portfolio overview</h1><p>Six-stock paper portfolio <span>·</span> ${esc(calendarDay(asof))}</p></header>` +
+    `<div class="kpis">${kpi("Portfolio value",money(nav,2), "USD · marked paper NAV")}` +
+    `${kpi("Unhedged beta",formatBeta(equityBeta),"Same stock basket · decision marks")}` +
+    `${kpi("Beta with booked hedge",formatBeta(bookedBeta),betaChange,"primary-ink")}` +
+    `${kpi("Hedge contribution",signedMoney(effect,2),effectBps==null?"After recorded fees":num(effectBps,3)+" bp since opening",effect<0?"cost-ink":effect>0?"gain-ink":"")}</div>` +
+    `<div class="study-update"><div><strong>Latest GDELT research</strong><span>Sunday, November 22 · 11 a.m.–noon Eastern · ${num(latestStudy.queries)} stories</span></div>${linkPage("gdelt","Open Sunday’s study")}</div>` +
+    archiveWarning() + freshnessBanner() +
+    `<div class="overview-grid">${stressPanel()}${exposureCard()}${performancePanel()}${intelligenceCard()}</div>` +
+    `<div class="journal-shortcut"><span><b>Decision journal</b> · ${journal.length} recorded · ${journal.filter(row=>!row.outcome).length} awaiting a mark</span>${linkPage("journal","Review outcomes")}</div>` +
+    `<div class="origin-note">${esc(d.snapshot_note || (closing?"The paper portfolio is valued at recorded IBKR closing prices.":"Position and returns use the paper ledger’s latest recorded marks."))}</div>`;
+}
+
+const quality = d.freshness?.rows || [];
+const warnings = quality.filter(row => !["Current", "Replay close", "Reference", "Dated"].includes(row
+  .status));
+const journal = d.history || [];
+const prettyDate = value => !value ? "—" : /^\d{4}-\d{2}-\d{2}$/.test(value) ? calendarDay(value) : et(
+  value);
+
+function archiveWarning() {
+  const now = Date.now(),
+    f = d.freshness;
+  if (!sample && f && (closing ? now >= Date.parse(f.next_open) : now - Date.parse(d.as_of) > f
+      .max_quote_age_seconds * 1000))
+    return '<p class="notice"><b>Archived prices.</b> This snapshot is dated ' + esc(calendarDay(f
+      .session)) + '. ' + (closing ? 'A newer NYSE session has opened.' :
+      'The live quote age limit has elapsed.') + '</p>';
+  return "";
+}
+
+function freshnessBanner() {
+  if (!quality.length) return '<div class="warning-strip">Source dates unavailable. ' + linkPage(
+    "freshness", "Inspect inputs") + '</div>';
+  const note = warnings.length ? warnings.slice(0, 2).map(row => (row.group === "GDELT" ?
+      "GDELT news cohort" : row.name) + " · " + row.status.toLowerCase() + (row.observed ? " (" +
+      prettyDate(row.observed) + ")" : "")).join(" / ") :
+    "All dated inputs met the checks for this review.";
+  return '<div class="' + (warnings.length ? "warning-strip" : "quality-summary") +
+    '"><span><b>Friday decision input freshness</b> &nbsp;' + esc(note) +
+    (warnings.length > 2 ? " · " + (warnings.length - 2) + " more" : "") + '</span>' + linkPage(
+      "freshness", "See source dates") + '</div>';
+}
+
+function freshnessPage() {
+  const grouped = [...new Set(quality.map(row => row.group))];
+  return title("Source dates & freshness",
+      "Times are Eastern. Flags compare each input with the session under review. An archived session keeps its original flags."
+      ) +
+    archiveWarning() + (d.market.price_mode === "last_close_rehearsal" ?
+      '<p class="notice">IBKR regular-session closing prices for ' + esc(d.market.session_date) +
+      '. Each instrument has a market timestamp and a separate retrieval time.</p>' : "") +
+    grouped.map(group => panel('<h2>' + esc(group) + '</h2>' + table(["Source", "Status",
+        "Information / market time", "Issued / received", "Forecast through", "Assessment"
+      ],
+      quality.filter(row => row.group === group).map(row => [row.name, row.status, prettyDate(row
+        .observed), prettyDate(row.received), prettyDate(row.horizon), row.reason])))).join("") +
+    (quality.length ? "" : panel('<p class="empty">The saved run has no dated evidence ledger.</p>'));
+}
+
+function journalPage() {
+  const scored = journal.filter(row => row.outcome);
+  const helped = scored.filter(row => row.outcome.result === "Helped").length,
+    cost = scored.filter(row => row.outcome.result === "Cost").length;
+  return title("Decision journal",
+      "The forward record pairs each timestamped Astra decision with market observations collected after it was recorded. A subsequent review can use only the entries and marks available at its own cutoff."
+      ) +
+    (d.history_as_of ? '<p class="note">Journal as of ' + esc(et(d.history_as_of)) + '</p>' : "") +
+    stats(["Decisions", journal.length, "Recorded Astra reviews"], ["Pending forward outcome", journal
+      .length - scored.length, "First post-decision mark, then a later session"
+    ], ["Outcome vs keeping the hedge", helped + " helped / " + cost + " cost", (scored.length -
+      helped - cost) + " neutral"]) +
+    (journal.length ? journal.map(row => {
+      const o = row.outcome,
+        start = row.study_start;
+      return panel('<div class="row"><h2>' + esc(calendarDay(row.session)) + ' · ' + esc(row
+        .action) + '</h2><span class="state ' + (o ? "ok" : "info") + '">' + esc(o ? o.result +
+          " vs prior position" : "Pending outcome") + '</span></div>' +
+        '<p class="note">' + esc(row.basis) + ' · ' + esc(row.contract) + ' · ' + esc(positionName(
+          row.previous)) + ' → ' + esc(positionName(row.target)) + ' · ' + esc(row.time ? et(row
+          .time) : "Decision time unavailable") + '</p>' +
+        '<p class="measure">' + esc(row.rationale) + '</p>' +
+        (o ? table(["Forward entry", "Entry observed", "Follow-up", "Follow-up observed",
+            "Versus keeping position", "Versus zero futures"
+          ], [
+            [num(start.price, 2), prettyDate(start.observed), num(o.exit_mark, 2), prettyDate(o
+              .observed), signedMoney(Number(o.versus_keep_usd)), signedMoney(Number(o
+              .versus_unhedged_usd))]
+          ]) :
+          '<p class="note">Reference ' + esc(num(row.reference_price, 2)) +
+          ' points · change fee ' + money(row.fee_usd, 2) + '. ' + (start ? 'Forward entry ' + esc(
+              num(start.price, 2)) + ' points at ' + esc(prettyDate(start.observed)) +
+            '. Awaiting a later session.' : 'Awaiting the first eligible post-decision mark.') +
+          '</p>') +
+        (o?.alternatives ? details("Other targets available at the decision", table(["MES target",
+            "Forward P&L vs keeping position"
+          ],
+          Object.entries(o.alternatives).map(([key, value]) => [signed(Number(key)),
+            signedMoney(Number(value))
+          ]))) : "") +
+        details("Decision record", memo("Response", row.id) + (row.model ? memo("Model", row
+            .model) : "") + (row.prompt_sha256 ? memo("Prompt SHA-256", row.prompt_sha256) : "") +
+          memo("Analyst batch", row.analyst_run) + memo("GDELT study", row.gdelt_run_id) +
+          (row.countercase ? memo("Countercase recorded at decision", row.countercase) : "") + (row
+            .reconsider_if ? memo("Reconsider if", row.reconsider_if) : "") +
+          (o ? memo("Follow-up source", o.mark_basis + " · received " + prettyDate(o.available)) :
+            "")));
+    }).join("") : panel('<p class="empty">This snapshot contains no archived Astra decisions.</p>')) +
+    panel(
+      '<h2>How decisions are scored</h2><p class="note">Both scoring prices must follow the recorded decision. The first eligible IBKR observation sets the study entry. The first observation in a later session on the same expiry sets the exit. The comparison includes the modeled change fee; study marks do not guarantee a fill. Keeping the previous position measures the decision to change it. Zero futures measures the full overlay. Live advisory studies are hypothetical. The Portfolio view uses recorded paper marks and fills. Historical analog returns and stress scenarios are excluded from the forward record.</p>'
+      );
+}
+
+const pages = {
+  overview: overviewPage,
+  journal: journalPage,
+  freshness: freshnessPage,
+  map: mapPage,
+  analysts: analystPage,
+  gdelt: () => gdeltPage(latestStudy),
+  "gdelt-decision": () => gdeltPage(g),
+  hedge: hedgePage,
+  portfolio: bookPage,
+};
+
+function show(key, scroll) {
+  if (!Object.hasOwn(pages, key)) key = "overview";
+  const navKey = key === "gdelt-decision" ? "gdelt" : key;
+  for (let b of document.querySelectorAll("nav button")) {
+    b.classList.toggle("on", b.dataset.page === navKey);
+    if (b.dataset.page === navKey) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  }
+  v.innerHTML = pages[key]();
+  if (key === "analysts") showReceipt();
+  if (scroll) window.scrollTo(0, 0);
+}
+document.querySelector("nav").innerHTML = Object.entries(navGroups).map(([title, tabs]) =>
+  '<span class="nav-group">' + title + '</span>' + Object.entries(tabs).map(([key, name]) =>
+    '<button data-page="' + key + '">' + name + '</button>').join("")).join("");
+document.querySelector("#mode").textContent = sample || control ? "Scripted paper example" : closing ?
+  "Portfolio hedge review" : "Market-hours advisory";
+document.querySelector("#asof").textContent = d.snapshot_asof_label || "Review as of " + et(d.as_of);
+const sessionsLink = document.querySelector("#worker-files");
+if (sample || control || !d.links?.workerSessions) sessionsLink.remove();
+else sessionsLink.href = d.links.workerSessions;
+document.querySelector("#largeMap").src = mapSrc;
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("button");
+  if (!el) return;
+  if (el.dataset.page) {
+    location.hash = el.dataset.page;
+    show(el.dataset.page, true);
+  }
+  if (el.dataset.switch) {
+    if (["difference", "totals"].includes(el.dataset.switch)) compareMode = el.dataset.switch;
+    else performanceMode = el.dataset.switch;
+    show("overview", false);
+  }
+  if (el.dataset.stock) {
+    stock = el.dataset.stock;
+    show("analysts", false);
+  }
+  if (el.id === "open-gdelt") {
+    const dialog = document.querySelector("#gdelt-dialog");
+    dialog.querySelector("iframe").srcdoc = g.producer_page;
+    dialog.showModal();
+  }
+  if (el.id === "expand") document.querySelector("#mapdialog").showModal();
+});
+document.addEventListener("change", async (e) => {
+  let el = e.target;
+  if (el.id === "datepick" || el.id === "group") {
+    const key = location.hash.slice(1);
+    if (el.id === "datepick") selectedDates.set((key === "gdelt-decision" ? g : latestStudy).run,
+      el.value);
+    else group = el.value;
+    show(key, false);
+  }
+  if (el.id === "inspectSymbol") {
+    inspectSymbol = el.value;
+    showReceipt();
+  }
+  if (el.id === "realPacket" && el.files.length) {
+    const r = receiptData;
+    inspected = null;
+    packetError = "";
+    try {
+      const packet = await inspectPacket(el.files[0], r);
+      if (r !== receiptData) return;
+      inspected = packet;
+      inspectSymbol = "AAPL";
+    } catch (err) {
+      if (r !== receiptData) return;
+      packetError = err.message;
+    }
+    showReceipt();
+  }
+  if (el.id === "receipt" && el.files.length) {
+    inspected = null;
+    packetError = "";
+    try {
+      if (el.files[0].size > 2e6) throw Error("Receipt too large");
+      let r = JSON.parse(await el.files[0].text());
+      if (
+        !r.run_id ||
+        !r.session_date ||
+        !r.status ||
+        !r.subjects ||
+        !Object.values(r.subjects).every((x) => typeof x?.status === "string")
+      )
+        throw Error("Expected dated producer status.json");
+      receiptData = r;
+    } catch (err) {
+      receiptData = {
+        error: err.message
+      };
+    }
+    showReceipt();
+  }
+});
+window.addEventListener("hashchange", () => show(location.hash.slice(1), true));
+show(location.hash.slice(1) || "overview", false);
+</script>
+</body>
+
+</html>

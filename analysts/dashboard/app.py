@@ -18,7 +18,7 @@ from google.cloud import storage
 
 SUBJECTS = {
     s: v["name"]
-    for s, v in json.loads((Path(__file__).resolve().parents[1] / "securities.json").read_text()).items()
+    for s, v in json.loads((Path(__file__).parent / "securities.json").read_text()).items()
     if v["enabled"]
 }
 FORECAST_FIELDS = (
@@ -51,7 +51,9 @@ PROVIDER_ERRORS = {
 
 
 def encode(value):
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+    )
 
 
 def instant(value):
@@ -76,7 +78,9 @@ def load_cycle(folder, symbol):
         raise ValueError("Only a terminal cycle can be published.")
     cutoff = instant(result["as_of"])
     request_path = folder / "request.json"
-    payload = json.loads(json.loads(request_path.read_text())["input"]) if request_path.exists() else {}
+    payload = (
+        json.loads(json.loads(request_path.read_text())["input"]) if request_path.exists() else {}
+    )
     forecast = payload.get("forecast", {})
     if forecast and (forecast["symbol"] != symbol or payload["as_of"] != result["as_of"]):
         raise ValueError("Request, forecast and result identity differ.")
@@ -124,9 +128,18 @@ def load_cycle(folder, symbol):
         record.update(
             decision=select(
                 observation["decision"],
-                ("decision", "reason", "watch_for", "review_question", "condition_ids", "evidence_ids"),
+                (
+                    "decision",
+                    "reason",
+                    "watch_for",
+                    "review_question",
+                    "condition_ids",
+                    "evidence_ids",
+                ),
             ),
-            checks=[select(c, ("id", "status", "note", "source_urls")) for c in observation["checks"]],
+            checks=[
+                select(c, ("id", "status", "note", "source_urls")) for c in observation["checks"]
+            ],
             events=[
                 select(
                     e,
@@ -145,7 +158,8 @@ def load_cycle(folder, symbol):
             action=result["handoff"]["action"],
             new_referral=result["alert"]["new"],
             coverage=select(
-                result["coverage"], ("status", "gaps", "checked_through", "scope", "unverified_findings")
+                result["coverage"],
+                ("status", "gaps", "checked_through", "scope", "unverified_findings"),
             ),
             price=select(
                 payload.get("price_check", {}),
@@ -280,7 +294,8 @@ def publish(store, record):
                     or record["status"] not in ("completed", "failed")
                     or not record.get("recovered_from_result_sha256")
                     or not previous
-                    or previous.get("source_result_sha256") != record["recovered_from_result_sha256"]
+                    or previous.get("source_result_sha256")
+                    != record["recovered_from_result_sha256"]
                     or previous.get("status") != "requires_review"
                     or previous.get("symbol") != symbol
                     or prior["cycle"] != pointer["cycle"]
@@ -402,18 +417,16 @@ def research_copy(value):
     """Use the published team name in saved research prose. The JSON evidence keeps its original bytes."""
     if not isinstance(value, str):
         return value
-    old_name = os.environ.get("RESEARCH_TEAM_FORMER_NAME")
-    if old_name:
-        words = r"[ \t\u00a0-]+".join(re.escape(word) for word in old_name.split())
-        value = re.sub(r"\b" + words + r"\b", "Equity and Index Research Team", value, flags=re.I)
+    text = re.sub(r"\bBig[ \t\u00a0]+Seven\b", "Equity and Index Research Team", value)
+    # Personal directions in an analyst memo refer to the portfolio manager. Keep names in cited articles.
     contact = os.environ.get("PORTFOLIO_REPORT_CONTACT")
-    if contact:
-        value = re.sub(
-            r"\b([Ff])or " + re.escape(contact) + r"(?=\s*(?:[,:;.!?]|to\b|$))",
-            lambda m: m[1] + "or the portfolio manager",
-            value,
-        )
-    return value
+    if not contact:
+        return text
+    return re.sub(
+        r"\b([Ff])or " + re.escape(contact) + r"(?=\s*(?:[,:;.!?]|to\b|$))",
+        lambda m: m[1] + "or the portfolio manager",
+        text,
+    )
 
 
 @app.template_filter("reason_label")
@@ -459,7 +472,9 @@ def fleet_status():
 
 @app.get("/")
 def home():
-    return render_template("dashboard.html", rows=current_rows(), selected=None, fleet=fleet_status())
+    return render_template(
+        "dashboard.html", rows=current_rows(), selected=None, fleet=fleet_status()
+    )
 
 
 @app.get("/target/<symbol>")
@@ -591,7 +606,15 @@ def portfolio_research(store, symbols=SUBJECTS, fleet=None, now=None):
         execute=False,
         fleet=select(
             fleet or {},
-            ("test_id", "phase", "checked_at", "starts_at", "ends_at", "model_profile", "monitor_model"),
+            (
+                "test_id",
+                "phase",
+                "checked_at",
+                "starts_at",
+                "ends_at",
+                "model_profile",
+                "monitor_model",
+            ),
         ),
         all_reports_available=all(r["status"] == "available" for r in reports.values()),
         subjects=reports,
@@ -650,7 +673,9 @@ def portfolio_closeout(test_id):
 @app.get("/api/status")
 def api_status():
     return jsonify(
-        rows=current_rows(), fleet=fleet_status(), generated_at=datetime.now(timezone.utc).isoformat()
+        rows=current_rows(),
+        fleet=fleet_status(),
+        generated_at=datetime.now(timezone.utc).isoformat(),
     )
 
 
@@ -675,6 +700,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cycle-dir", required=True, type=Path)
     parser.add_argument("--symbol", required=True, choices=SUBJECTS)
-    parser.add_argument("--store", required=True, help="gs://BUCKET, or a local directory for rehearsal")
+    parser.add_argument(
+        "--store", required=True, help="gs://BUCKET, or a local directory for rehearsal"
+    )
     args = parser.parse_args()
     print(publish(Store(args.store), load_cycle(args.cycle_dir, args.symbol)))

@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1540" height="973" viewBox="0 0 1540 973" role="img" aria-labelledby="title desc">
+  <title id="title">Portfolio hedge architecture</title>
+  <desc id="desc">The Equity and Index Research Team publishes seven forecasts. A separate GDELT research worker supplies historical news matches and S&amp;P 500 return paths. The portfolio hedge worker weighs both studies with the alternatives computed from independently obtained Interactive Brokers prices and the simulated portfolio. It records a decision to hold, adjust or defer. When the hedge changes, the system records the paper fill in the SQLite ledger. The dashboard compares the hedged portfolio with the same holdings without the futures overlay.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L6,3 L0,6" fill="none" stroke="#6d8586" stroke-width="1.6"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1540" height="973" rx="0" fill="#faf9f5" stroke="none" stroke-width="1.4"/>
+  <rect x="0" y="0" width="1540" height="8" rx="0" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="38" y="49" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="650" letter-spacing="2">CMU AGENTIC AI CAPSTONE</text>
+  <text x="38" y="102" text-anchor="start" fill="#152d38" font-family="DejaVu Serif, Georgia, serif" font-size="43" font-weight="400" letter-spacing="0">Portfolio hedge architecture</text>
+  <text x="38" y="137" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0">Daily analyst research and historical analogs feed a paper hedge decision. Market-closed tests use the last completed close.</text>
+  <text x="38" y="190" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="650" letter-spacing="1.8">ANALYST RESEARCH</text>
+  <text x="422" y="190" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="650" letter-spacing="1.8">HISTORICAL ANALOGS</text>
+  <text x="806" y="190" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="650" letter-spacing="1.8">HEDGE PRICING</text>
+  <text x="1162" y="190" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="650" letter-spacing="1.8">SIMULATED PORTFOLIO</text>
+  <rect x="38" y="208" width="365" height="82" rx="10" fill="#f0f3f5" stroke="#b3c1c8" stroke-width="1.4"/>
+  <text x="55" y="238" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Analyst data sources</text>
+  <text x="55" y="263" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Public filings and news searches</text>
+  <text x="55" y="284" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Interactive Brokers · dated reference prices</text>
+  <rect x="422" y="208" width="365" height="82" rx="10" fill="#f0f3f5" stroke="#b3c1c8" stroke-width="1.4"/>
+  <text x="439" y="238" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">GDELT Global Knowledge Graph</text>
+  <text x="439" y="263" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Public GDELT news metadata</text>
+  <text x="439" y="284" text-anchor="start" fill="#425963" font-family="Inter, DejaVu Sans, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Stored S&amp;P 500 closing-price history</text>
+  <rect x="806" y="208" width="337" height="82" rx="10" fill="#f0f3f5" stroke="#b3c1c8" stroke-width="1.4"/>
+  <text x="823" y="238" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Interactive Brokers</text>
+  <text x="823" y="263" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Hedge worker requests its own prices</text>
+  <rect x="1162" y="208" width="340" height="82" rx="10" fill="#f0f3f5" stroke="#b3c1c8" stroke-width="1.4"/>
+  <text x="1179" y="238" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Course portfolio</text>
+  <text x="1179" y="263" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Six fixed stock quantities · starting cash</text>
+  <text x="1179" y="285" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">AAPL · DE · DELL · MSFT · NVDA · WMT</text>
+  <path d="M220.5,290 V315" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M604.5,290 V315" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M974.5,290 V315" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M1332.0,290 V315" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="38" y="316" width="365" height="116" rx="10" fill="#fffefd" stroke="#b1bdbe" stroke-width="1.4"/>
+  <text x="55" y="346" text-anchor="start" fill="#152d38" font-family="DejaVu Sans, Arial, sans-serif" font-size="18" font-weight="650" letter-spacing="0">Equity and Index Research Team</text>
+  <text x="55" y="371" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Business · valuation · catalysts</text>
+  <text x="55" y="393" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Geoeconomics · draft (Sol 6.2)</text>
+  <text x="55" y="415" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Critique → final report (Astra 6.2)</text>
+  <rect x="422" y="316" width="365" height="116" rx="10" fill="#eaf4ef" stroke="#7ba599" stroke-width="1.4"/>
+  <rect x="423" y="328" width="4" height="92" rx="2" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="439" y="346" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">BigQuery corpus &amp; indexes</text>
+  <text x="439" y="371" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Filtered GKG documents · dense vectors</text>
+  <text x="439" y="393" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">BM25 terms and weights · 2M history</text>
+  <text x="439" y="415" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Historical S&amp;P paths through session 20</text>
+  <rect x="806" y="316" width="337" height="116" rx="10" fill="#fffefd" stroke="#b1bdbe" stroke-width="1.4"/>
+  <text x="823" y="346" text-anchor="start" fill="#152d38" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Hedge price capture</text>
+  <text x="823" y="371" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Six equities · SPX cash index · exact MES</text>
+  <text x="823" y="393" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Market quotes or IBKR closing bars</text>
+  <rect x="1162" y="316" width="340" height="116" rx="10" fill="#eaf4ef" stroke="#7ba599" stroke-width="1.4"/>
+  <rect x="1163" y="328" width="4" height="92" rx="2" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="1179" y="346" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">SQLite portfolio ledger</text>
+  <text x="1179" y="371" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Signed contracts by expiry · cash flows</text>
+  <text x="1179" y="393" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Simulated fills, fees and valuation marks</text>
+  <path d="M220.5,432 V458" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M604.5,432 V458" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="38" y="459" width="365" height="91" rx="10" fill="#eaf4ef" stroke="#7ba599" stroke-width="1.4"/>
+  <rect x="39" y="471" width="4" height="67" rx="2" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="55" y="489" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Published analyst reports</text>
+  <text x="55" y="514" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Dated receipt → checksum-verified packet</text>
+  <text x="55" y="536" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">7 final reports · forecast IDs · cutoffs</text>
+  <rect x="422" y="459" width="365" height="91" rx="10" fill="#fffefd" stroke="#b1bdbe" stroke-width="1.4"/>
+  <text x="439" y="489" text-anchor="start" fill="#152d38" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Match, rank &amp; interpret</text>
+  <text x="439" y="514" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Cosine + BM25 → reciprocal rank fusion</text>
+  <text x="439" y="536" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Historical date votes, paths and reader</text>
+  <path d="M604.5,550 V572" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="422" y="573" width="365" height="85" rx="10" fill="#eaf4ef" stroke="#7ba599" stroke-width="1.4"/>
+  <rect x="423" y="585" width="4" height="61" rx="2" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="439" y="603" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Saved GDELT packet</text>
+  <text x="439" y="628" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Handoff, article pairs, paths and receipt</text>
+  <path d="M974.5,432 V478 H1057 V506" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M1332.0,432 V478 H1256 V506" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="875" y="507" width="583" height="105" rx="10" fill="#eff2f9" stroke="#9aa9c8" stroke-width="1.4"/>
+  <text x="892" y="537" text-anchor="start" fill="#3e568c" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Mark the book &amp; compare alternatives</text>
+  <text x="892" y="562" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Fresh stock weights · current futures overlay · costs</text>
+  <text x="892" y="584" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Calculate rally, flat and decline cases for signed MES targets.</text>
+  <path d="M220.5,550 V680 H532 V702" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M604.5,658 V702" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M1167,612 V680 H1008 V702" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="376" y="703" width="795" height="93" rx="10" fill="#253f4e" stroke="#253f4e" stroke-width="1.4"/>
+  <text x="393" y="733" text-anchor="start" fill="#fff" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Portfolio hedge worker · Astra 6.2 · high reasoning</text>
+  <text x="393" y="758" text-anchor="start" fill="#d7e6e8" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Market and basket outlooks · direction since cutoff · evidence weighting</text>
+  <text x="393" y="780" text-anchor="start" fill="#d7e6e8" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Choose hold, adjust or defer. Write the investment case, contrary evidence and reversal condition.</text>
+  <path d="M590,796 V824 H324 V847" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <path d="M785,796 V847" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <path d="M967,796 V824 H1243 V847" fill="none" stroke="#70878a" stroke-width="2" stroke-linejoin="round" stroke-dasharray="" marker-end="url(#arrow)"/>
+  <rect x="38" y="848" width="462" height="86" rx="10" fill="#eaf4ef" stroke="#7ba599" stroke-width="1.4"/>
+  <rect x="39" y="860" width="4" height="62" rx="2" fill="#146d62" stroke="none" stroke-width="1.4"/>
+  <text x="55" y="878" text-anchor="start" fill="#146d62" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Decision record</text>
+  <text x="55" y="903" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Prompt, model receipt, source IDs, target and delta</text>
+  <rect x="527" y="848" width="482" height="86" rx="10" fill="#fffefd" stroke="#b1bdbe" stroke-width="1.4"/>
+  <text x="544" y="878" text-anchor="start" fill="#152d38" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Paper simulator → SQLite ledger</text>
+  <text x="544" y="903" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Independent fill quote · signed fill · fees · P&amp;L</text>
+  <rect x="1036" y="848" width="466" height="86" rx="10" fill="#fffefd" stroke="#b1bdbe" stroke-width="1.4"/>
+  <text x="1053" y="878" text-anchor="start" fill="#152d38" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="650" letter-spacing="0">Demo &amp; portfolio comparison</text>
+  <text x="1053" y="903" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="15" font-weight="400" letter-spacing="0">Research views → hedge memo → hedged vs unhedged</text>
+  <text x="38" y="960" text-anchor="start" fill="#425963" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">November 20, 2026   •   Green boxes store data. The dashed path records a simulated fill for a hedge adjustment. The desk shows the IBKR price date for each decision.</text>
+</svg>

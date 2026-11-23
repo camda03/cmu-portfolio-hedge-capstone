@@ -1,9 +1,0 @@
-{
-  "DE": {"name": "Deere & Company", "subject": "Deere & Company (DE)", "calendar": "NYSE", "contract_id": 6393, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "MSFT": {"name": "Microsoft", "subject": "Microsoft (MSFT)", "calendar": "NASDAQ", "contract_id": 272093, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "AAPL": {"name": "Apple", "subject": "Apple (AAPL)", "calendar": "NASDAQ", "contract_id": 265598, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "NVDA": {"name": "NVIDIA", "subject": "NVIDIA (NVDA)", "calendar": "NASDAQ", "contract_id": 4815747, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "DELL": {"name": "Dell Technologies", "subject": "Dell Technologies (DELL)", "calendar": "NYSE", "contract_id": 346218218, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "WMT": {"name": "Walmart", "subject": "Walmart (WMT)", "calendar": "NASDAQ", "contract_id": 13824, "security_type": "STK", "quote_unit": "USD", "enabled": true},
-  "SP500": {"name": "S&P 500", "subject": "S&P 500 cash price index (SPX)", "calendar": "NYSE", "contract_id": 416904, "security_type": "IND", "quote_unit": "index points", "enabled": true}
-}

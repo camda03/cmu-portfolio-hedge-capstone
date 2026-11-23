@@ -1,0 +1,76 @@
+{
+  "project": "{project}",
+  "location": "US",
+  "baseline_dataset": "{baseline_dataset}",
+  "parameters": {
+    "as_of_utc": "2026-10-31T00:29:01.596982+00:00",
+    "sample_seed": "gkg-articles-2m-v01-r01",
+    "target_documents": 2000000,
+    "expected_document_count": 2000000,
+    "market_observations": 2515
+  },
+  "mode_bindings": {
+    "saved": {
+      "identifiers": {
+        "corpus_documents": "{baseline_dataset}.corpus_documents",
+        "dense_documents": "{baseline_dataset}.advance_dense_documents_v01",
+        "dense_vectors": "{baseline_dataset}.advance_dense_vectors_v01",
+        "dense_dataset": "{baseline_dataset}",
+        "market_paths": "{baseline_dataset}.market_paths",
+        "bm25_history": "{baseline_dataset}.advance_stable_bm25_history_2m_v01",
+        "bm25_terms": "{baseline_dataset}.advance_stable_bm25_terms_2m_v01",
+        "bm25_weights": "{baseline_dataset}.advance_stable_bm25_weights_2m_v01",
+        "query_documents": "{baseline_dataset}.eval500_query_documents_v01",
+        "query_requests": "{baseline_dataset}.eval500_requests_v01",
+        "query_vectors": "{baseline_dataset}.eval500_query_vectors_v01"
+      },
+      "parameters": {
+        "window_start": "2026-10-30T23:00:00+00:00",
+        "reference_seed": "gkg-full2m-exact-reference-32-v01-r01",
+        "request_k": 20,
+        "exclude_identical_inputs": false,
+        "expected_history_documents": 2000000,
+        "expected_history_inputs": 1959757,
+        "expected_query_documents": 500,
+        "expected_query_inputs": 485,
+        "expected_lexical_terms": 1742774,
+        "expected_lexical_weight_rows": 90552819,
+        "dense_index_name": "advance_dense_vector_index_v01",
+        "dense_table_name": "advance_dense_vectors_v01",
+        "minimum_mean_recall": 0.95,
+        "minimum_query_recall": 0.8
+      }
+    },
+    "filtered": {
+      "identifiers": {
+        "corpus_documents": "{dataset}.corpus_documents",
+        "dense_documents": "{dataset}.filtered_dense_documents_v01",
+        "dense_vectors": "{dataset}.filtered_dense_vectors_v01",
+        "dense_dataset": "{dataset}",
+        "market_paths": "{dataset}.market_paths",
+        "bm25_history": "{dataset}.filtered_stable_bm25_history_v01",
+        "bm25_terms": "{dataset}.filtered_stable_bm25_terms_v01",
+        "bm25_weights": "{dataset}.filtered_stable_bm25_weights_v01",
+        "query_documents": "{dataset}.filtered_verify_query_documents_v01",
+        "query_requests": "{baseline_dataset}.eval500_requests_v01",
+        "query_vectors": "{dataset}.filtered_verify_query_vectors_v01"
+      },
+      "parameters": {
+        "window_start": "2026-10-30T23:00:00+00:00",
+        "reference_seed": "gkg-filtered-2m-reference32-v01-r01",
+        "request_k": 22,
+        "exclude_identical_inputs": true,
+        "expected_history_documents": 2000000,
+        "expected_history_inputs": null,
+        "expected_query_documents": null,
+        "expected_query_inputs": null,
+        "expected_lexical_terms": null,
+        "expected_lexical_weight_rows": null,
+        "dense_index_name": "filtered_dense_vector_index_v01",
+        "dense_table_name": "filtered_dense_vectors_v01",
+        "minimum_mean_recall": 0.95,
+        "minimum_query_recall": 0.8
+      }
+    }
+  }
+}

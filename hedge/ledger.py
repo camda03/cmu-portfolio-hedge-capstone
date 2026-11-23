@@ -6,7 +6,6 @@ from contextlib import closing
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import json
-import os
 from pathlib import Path
 import re
 import sqlite3
@@ -46,10 +45,7 @@ def open_book(db, seed=None):
     if row:
         return json.loads(row[0])
     if seed is None:
-        opening_file = os.environ.get("HEDGE_OPENING_FILE")
-        if not opening_file:
-            raise ValueError("Supply a simulated opening book through HEDGE_OPENING_FILE.")
-        seed = json.loads(Path(opening_file).read_text())
+        seed = json.loads(Path(__file__).with_name("opening.json").read_text())
     db.execute(
         "INSERT INTO journal VALUES ('opening', ?, NULL, ?, ?)",
         (instant(seed["at"]).isoformat(), json.dumps(seed), '{"status":"opening"}'),
@@ -111,7 +107,9 @@ def outcome(event, seed):
 
 def record(db, seed, event):
     key = event["id"]
-    if key == "opening" or not all(isinstance(v, str) and v.strip() for v in (key, event.get("source"))):
+    if key == "opening" or not all(
+        isinstance(v, str) and v.strip() for v in (key, event.get("source"))
+    ):
         raise ValueError("Supply a unique event ID and a named source.")
     prior = db.execute("SELECT request, receipt FROM journal WHERE id = ?", (key,)).fetchone()
     request = json.dumps(event, sort_keys=True, allow_nan=False)
@@ -148,7 +146,8 @@ def statement(seed, events):
     base = number(seed["cash_usd"])
     opening = base + sum(number(v["value_usd"]) for v in stocks.values())
     marks = {
-        s: (number(v["value_usd"]) / v["shares"], seed["at"], seed["source"]) for s, v in stocks.items()
+        s: (number(v["value_usd"]) / v["shares"], seed["at"], seed["source"])
+        for s, v in stocks.items()
     }
     lots = defaultdict(deque)
     realized = fees = income = Decimal(0)
@@ -164,7 +163,6 @@ def statement(seed, events):
         symbol, qty, price = e["contract"], e["contracts"], number(receipt["fill_price"])
         fees += number(e["fee_usd"])
         book = lots[symbol]
-        # Offset the oldest opposing lots first. Only open lots carry price risk.
         while book and qty * book[0][0] < 0:
             held, entry = book[0]
             closed = min(abs(held), abs(qty)) * (1 if held > 0 else -1)
@@ -185,7 +183,11 @@ def statement(seed, events):
         value = (stock["shares"] * price).quantize(CENT, rounding=ROUND_HALF_UP)
         equity_value += value
         equity[s] = dict(
-            shares=stock["shares"], mark=str(price), marked_at=at, source=source, value_usd=usd(value)
+            shares=stock["shares"],
+            mark=str(price),
+            marked_at=at,
+            source=source,
+            value_usd=usd(value),
         )
     for s, book in lots.items():
         price, at, source = marks[s]
@@ -223,10 +225,14 @@ def statement(seed, events):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--db", default="paper-portfolio.sqlite3", help="path to the working ledger")
+    parser.add_argument(
+        "--db", default="paper-portfolio.sqlite3", help="path to the working ledger"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("status", "history"):
-        commands.add_parser(name).add_argument("--as-of", help="inclusive timestamp with UTC offset")
+        commands.add_parser(name).add_argument(
+            "--as-of", help="inclusive timestamp with UTC offset"
+        )
     research = commands.add_parser(
         "research", help="build a decision input from saved research and the book"
     )
@@ -246,7 +252,9 @@ def main():
             event = json.loads(raw, parse_float=str)
             result = {"id": event["id"], **record(db, seed, event)}
         else:
-            cutoff = instant(args.as_of) if args.as_of else datetime.max.replace(tzinfo=timezone.utc)
+            cutoff = (
+                instant(args.as_of) if args.as_of else datetime.max.replace(tzinfo=timezone.utc)
+            )
             if args.command == "research" and not args.as_of:
                 cutoff = datetime.now(timezone.utc)
             if cutoff < instant(seed["at"]):

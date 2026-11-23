@@ -88,7 +88,11 @@ def object_bytes(location):
                 if not shutil.which("gcloud"):
                     raise
             else:
-                return client.bucket(uri.netloc).blob(uri.path.lstrip("/")).download_as_bytes(timeout=30)
+                return (
+                    client.bucket(uri.netloc)
+                    .blob(uri.path.lstrip("/"))
+                    .download_as_bytes(timeout=30)
+                )
         return subprocess.run(
             ["gcloud", "storage", "cat", str(location)], check=True, stdout=subprocess.PIPE
         ).stdout
@@ -114,6 +118,11 @@ def worker_delivery(day, cutoff, account):
     from google.auth.transport.requests import AuthorizedSession, Request
     from google.cloud import storage
 
+    require(
+        DASHBOARD and RESEARCH_STORE.startswith("gs://"),
+        "Configure RESEARCH_DASHBOARD_URL and HEDGE_RESEARCH_STORE for worker delivery.",
+    )
+
     def attached(scopes):
         credentials = Credentials(scopes=scopes)
         credentials.refresh(Request())
@@ -133,7 +142,11 @@ def worker_delivery(day, cutoff, account):
         )
         return receipt["packet_key"]
 
-    meta = {"service_account": account, "host": socket.gethostname(), "transport": "dashboard_https"}
+    meta = {
+        "service_account": account,
+        "host": socket.gethostname(),
+        "transport": "dashboard_https",
+    }
     status_url = f"{DASHBOARD}/api/daily-research/{day}/status"
     try:
         credentials = attached(["openid", "https://www.googleapis.com/auth/userinfo.email"])
@@ -165,7 +178,9 @@ def worker_delivery(day, cutoff, account):
     bucket = storage.Client(
         project=os.environ.get("GOOGLE_CLOUD_PROJECT"), credentials=credentials
     ).bucket(urlsplit(RESEARCH_STORE).netloc)
-    receipt = json.loads(bucket.blob(f"daily-research/{day}/status.json").download_as_bytes(timeout=30))
+    receipt = json.loads(
+        bucket.blob(f"daily-research/{day}/status.json").download_as_bytes(timeout=30)
+    )
     raw = bucket.blob(packet_key(receipt)).download_as_bytes(timeout=30)
     return receipt | {"hedge_read": meta | {"transport": "cloud_storage"}}, raw
 
@@ -199,7 +214,8 @@ def daily_packet(receipt_location, batch, cutoff, packet_file=None):
             "The hosted hedge worker reads the dated publication.",
         )
         require(
-            date.fromisoformat(batch).isoformat() == batch, "Use an ISO calendar date for the batch."
+            date.fromisoformat(batch).isoformat() == batch,
+            "Use an ISO calendar date for the batch.",
         )
         receipt, raw = worker_delivery(batch, cutoff, account)
     else:
@@ -347,7 +363,9 @@ def prepare(receipt, feed, gdelt, gdelt_hash, book, market, policy, cutoff):
     bounds = policy.get("beta_bounds")
     if bounds is not None:
         require(
-            len(bounds) == 2 and number(bounds[0]) <= number(bounds[1]) and not table["missing_betas"],
+            len(bounds) == 2
+            and number(bounds[0]) <= number(bounds[1])
+            and not table["missing_betas"],
             "Beta limits require ordered bounds and six dated beta estimates.",
         )
     for row in table["candidates"]:
@@ -483,7 +501,9 @@ def model_review(inputs, client, response_path=None):
 
 
 def reviewed_response(inputs, response, prompt):
-    require(response["status"] == "completed" and response["output_text"], "Incomplete model response.")
+    require(
+        response["status"] == "completed" and response["output_text"], "Incomplete model response."
+    )
     memo = json.loads(response["output_text"])
     require(
         set(memo) == set(OUTPUT_FIELDS)
@@ -531,14 +551,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     check = sub.add_parser("check", help="verify the analyst publication at any hour")
-    review = sub.add_parser("review", help="collect fresh IBKR marks and obtain one advisory Astra memo")
+    review = sub.add_parser(
+        "review", help="collect fresh IBKR marks and obtain one advisory Astra memo"
+    )
     for cmd in (check, review):
         cmd.add_argument(
             "--receipt", help="override the default dated bucket receipt with a gs:// or local path"
         )
         cmd.add_argument("--batch", required=True, help="explicit research batch date")
         cmd.add_argument(
-            "--packet", type=Path, help="local packet path when different from the receipt's sibling"
+            "--packet",
+            type=Path,
+            help="local packet path when different from the receipt's sibling",
         )
     source = review.add_mutually_exclusive_group(required=True)
     source.add_argument("--gdelt", type=Path, help="completed GDELT v2 directory")
@@ -574,7 +598,7 @@ def main():
         return
     from openai import OpenAI
     from market_snapshot import collect
-    from desk import gdelt_view, render, tracker
+    from demo_view import gdelt_view, render, tracker
     import fcntl
 
     session_hours(clock(), args.session)
@@ -622,7 +646,9 @@ def main():
         with closing(sqlite3.connect(args.db, timeout=15)) as db, db:
             db.execute("BEGIN IMMEDIATE")
             seed = open_book(db)
-            book, marks = marked_book(db, seed, market, cutoff, opening, policy["max_mark_age_seconds"])
+            book, marks = marked_book(
+                db, seed, market, cutoff, opening, policy["max_mark_age_seconds"]
+            )
             for mark in marks:
                 symbol = next(iter(mark["prices"]))
                 event = {k: v for k, v in mark.items() if k != "receipt"}
@@ -639,7 +665,8 @@ def main():
         session_hours(clock(), args.session)
         require(
             all(
-                (clock() - instant(q["observed_at"])).total_seconds() <= policy["max_mark_age_seconds"]
+                (clock() - instant(q["observed_at"])).total_seconds()
+                <= policy["max_mark_age_seconds"]
                 for q in market["quotes"].values()
             ),
             "Decision marks expired before dispatch.",
@@ -651,7 +678,9 @@ def main():
             save(dest / "review-status.json", {"status": "human_review", "reason": str(exc)})
             raise
         memo.update(
-            mode="Astra advisory", completed_at=clock().isoformat(), session_close=closing_at.isoformat()
+            mode="Astra advisory",
+            completed_at=clock().isoformat(),
+            session_close=closing_at.isoformat(),
         )
         memo["recorded_at"] = clock().isoformat()
         save(dest / "decision.json", memo)

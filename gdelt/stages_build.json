@@ -1,0 +1,893 @@
+{
+  "schema": "gdelt-minimal-stages-v1",
+  "stages": {
+    "schema": {
+      "sql": "sql/build/schema.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 4,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "install_normalization": {
+      "sql": "sql/build/install_normalization.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 2,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "filter_fixture": {
+      "sql": "sql/build/filter_fixture.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "normalization_fixture": {
+      "sql": "sql/build/normalization_fixture.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "frozen_inputs": {
+      "sql": "sql/build/frozen_inputs.sql",
+      "parameters": {
+        "as_of_utc": "STRING",
+        "contract_json": "STRING",
+        "contract_sha256": "STRING",
+        "market_observations": "INT64",
+        "run_id": "STRING",
+        "sample_seed": "STRING",
+        "source_plan_json": "STRING",
+        "target_documents": "INT64"
+      },
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 10,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "market_paths": {
+      "sql": "sql/build/market_paths.sql",
+      "parameters": {
+        "as_of_utc": "STRING"
+      },
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "market_guard": {
+      "sql": "sql/build/market_guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "source_month_select": {
+      "sql": "sql/build/source_month_select.sql",
+      "parameters": {
+        "batch_month": "STRING",
+        "candidate_limit": "INT64",
+        "eligible_days": "ARRAY<STRING>",
+        "partition_end": "STRING",
+        "partition_start": "STRING",
+        "sample_seed": "STRING",
+        "source_collection": "INT64"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "source",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "source_month": {
+      "sql": "sql/build/source_month.sql",
+      "parameters": {
+        "batch_month": "STRING",
+        "candidate_limit": "INT64",
+        "eligible_days": "ARRAY<STRING>",
+        "partition_end": "STRING",
+        "partition_start": "STRING",
+        "sample_seed": "STRING",
+        "source_collection": "INT64"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "source",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "parse": {
+      "sql": "sql/build/parse.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 80000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "normalize": {
+      "sql": "sql/build/normalize.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 80000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "representative_before_filter": {
+      "sql": "sql/build/representative_before_filter.sql",
+      "parameters": {
+        "sample_seed": "STRING"
+      },
+      "maximum_bytes_billed": 50000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "expanded_decisions": {
+      "sql": "sql/build/expanded_decisions.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 30000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "filtered_representatives": {
+      "sql": "sql/build/filtered_representatives.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 25000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "deficient_days": {
+      "sql": "sql/build/deficient_days.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 1000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 3626,
+      "fields": {
+        "observed_day": "DATE",
+        "target_documents": "INT64",
+        "available": "INT64",
+        "missing_documents": "INT64"
+      }
+    },
+    "quota_guard": {
+      "sql": "sql/build/quota_guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 1000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "membership": {
+      "sql": "sql/build/membership.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 20000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "corpus": {
+      "sql": "sql/build/corpus.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 25000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "manifest": {
+      "sql": "sql/build/manifest.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 1000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "corpus_guard": {
+      "sql": "sql/build/corpus_guard.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 5000000000,
+      "statement_count": 4,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "corpus_status": {
+      "sql": "sql/build/corpus_status.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 5000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "documents": "INT64",
+        "distinct_documents": "INT64",
+        "distinct_ranks": "INT64",
+        "first_rank": "INT64",
+        "last_rank": "INT64",
+        "checkpoint_100k_documents": "INT64",
+        "checkpoint_1m_documents": "INT64",
+        "invalid_documents": "INT64",
+        "distinct_metadata_inputs": "INT64",
+        "represented_days": "INT64"
+      }
+    },
+    "corpus_manifest": {
+      "sql": "sql/build/corpus_manifest.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 2,
+      "fields": {
+        "document_count": "INT64",
+        "corpus_manifest_sha256": "STRING",
+        "build_contract_sha256": "STRING"
+      }
+    },
+    "dense_prepare/corpus-guard": {
+      "sql": "sql/build/dense_prepare_corpus-guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/requests": {
+      "sql": "sql/build/dense_prepare_requests.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/requests-guard": {
+      "sql": "sql/build/dense_prepare_requests-guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/cache-copy": {
+      "sql": "sql/build/dense_prepare_cache-copy.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/cache-guard": {
+      "sql": "sql/build/dense_prepare_cache-guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 1000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/inputs": {
+      "sql": "sql/build/dense_prepare_inputs.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/batches": {
+      "sql": "sql/build/dense_prepare_batches.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/documents": {
+      "sql": "sql/build/dense_prepare_documents.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/manifest": {
+      "sql": "sql/build/dense_prepare_manifest.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/raw": {
+      "sql": "sql/build/dense_prepare_raw.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_prepare/preparation-guard": {
+      "sql": "sql/build/dense_prepare_preparation-guard.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_preparation_status": {
+      "sql": "sql/build/dense_preparation_status.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 3,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "document_rows": "INT64",
+        "distinct_documents": "INT64",
+        "input_rows": "INT64",
+        "distinct_requests": "INT64",
+        "cached_inputs": "INT64",
+        "new_inputs": "INT64",
+        "batch_count": "INT64",
+        "batch_expected_inputs": "INT64",
+        "maximum_batch_inputs": "INT64",
+        "new_input_utf8_bytes": "INT64",
+        "maximum_new_input_utf8_bytes": "INT64",
+        "invalid_inputs": "INT64",
+        "cache_binding_errors": "INT64",
+        "document_binding_errors": "INT64",
+        "batch_errors": "INT64",
+        "manifest_errors": "INT64",
+        "preparation_contract_errors": "INT64"
+      }
+    },
+    "embedding_batches": {
+      "sql": "sql/build/embedding_batches.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 80,
+      "fields": {
+        "batch_number": "INT64",
+        "expected_inputs": "INT64"
+      }
+    },
+    "dense_batch_before": {
+      "sql": "sql/build/dense_batch_before.sql",
+      "parameters": {
+        "batch_number": "INT64"
+      },
+      "maximum_bytes_billed": 500000000,
+      "statement_count": 3,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "batch_rows": "INT64",
+        "expected_inputs": "INT64",
+        "input_cap": "INT64",
+        "actual_inputs": "INT64",
+        "distinct_inputs": "INT64",
+        "invalid_inputs": "INT64",
+        "manifest_errors": "INT64",
+        "existing_output_rows": "INT64",
+        "first_new_rank": "INT64",
+        "last_new_rank": "INT64"
+      }
+    },
+    "dense_embed": {
+      "sql": "sql/build/dense_embed.sql",
+      "parameters": {
+        "batch_number": "INT64",
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 1000000000,
+      "statement_count": 3,
+      "kind": "embedding",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_batch_after": {
+      "sql": "sql/build/dense_batch_after.sql",
+      "parameters": {
+        "batch_number": "INT64"
+      },
+      "maximum_bytes_billed": 2000000000,
+      "statement_count": 3,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "expected_inputs": "INT64",
+        "saved_rows": "INT64",
+        "distinct_saved_requests": "INT64",
+        "missing_outputs": "INT64",
+        "unexpected_outputs": "INT64",
+        "duplicate_outputs": "INT64",
+        "valid_outputs": "INT64",
+        "invalid_status_outputs": "INT64",
+        "wrong_dimension_outputs": "INT64",
+        "nonfinite_component_outputs": "INT64",
+        "invalid_norm_outputs": "INT64",
+        "distinct_valid_vectors": "INT64",
+        "minimum_vector_norm": "FLOAT64",
+        "maximum_vector_norm": "FLOAT64",
+        "saved_vector_components": "INT64",
+        "batch_manifest_errors": "INT64"
+      }
+    },
+    "dense_publish/preparation-guard": {
+      "sql": "sql/build/dense_publish_preparation-guard.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_publish/outputs-guard": {
+      "sql": "sql/build/dense_publish_outputs-guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_publish/membership-guard": {
+      "sql": "sql/build/dense_publish_membership-guard.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_publish/vectors": {
+      "sql": "sql/build/dense_publish_vectors.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_publish/final-guard": {
+      "sql": "sql/build/dense_publish_final-guard.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "dense_final_status": {
+      "sql": "sql/build/dense_final_status.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 3,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "expected_inputs": "INT64",
+        "vector_rows": "INT64",
+        "distinct_requests": "INT64",
+        "cached_vectors": "INT64",
+        "new_vectors": "INT64",
+        "invalid_vectors": "INT64",
+        "missing_vectors": "INT64",
+        "unexpected_vectors": "INT64",
+        "source_vector_changes": "INT64",
+        "document_rows": "INT64",
+        "distinct_documents": "INT64",
+        "document_mapping_errors": "INT64",
+        "unused_vectors": "INT64",
+        "raw_output_rows": "INT64",
+        "raw_distinct_requests": "INT64",
+        "manifest_errors": "INT64",
+        "final_contract_errors": "INT64"
+      }
+    },
+    "lexical_schema": {
+      "sql": "sql/build/lexical_schema.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 4,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "lexical/document-lengths": {
+      "sql": "sql/build/lexical_document-lengths.sql",
+      "parameters": {
+        "expected_document_count": "INT64"
+      },
+      "maximum_bytes_billed": 15000000000,
+      "statement_count": 7,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "document_count": "INT64",
+        "total_token_count": "INT64"
+      }
+    },
+    "lexical/postings": {
+      "sql": "sql/build/lexical_postings.sql",
+      "parameters": {
+        "expected_document_count": "INT64"
+      },
+      "maximum_bytes_billed": 15000000000,
+      "statement_count": 9,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "posting_count": "INT64",
+        "total_token_count": "INT64"
+      }
+    },
+    "lexical/term-statistics": {
+      "sql": "sql/build/lexical_term-statistics.sql",
+      "parameters": {
+        "expected_document_count": "INT64"
+      },
+      "maximum_bytes_billed": 15000000000,
+      "statement_count": 8,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "term_count": "INT64",
+        "posting_count": "INT64"
+      }
+    },
+    "lexical/corpus-statistics": {
+      "sql": "sql/build/lexical_corpus-statistics.sql",
+      "parameters": {
+        "expected_document_count": "INT64"
+      },
+      "maximum_bytes_billed": 15000000000,
+      "statement_count": 9,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "document_count": "INT64",
+        "total_token_count": "INT64",
+        "average_document_length": "FLOAT64"
+      }
+    },
+    "bm25_prepare": {
+      "sql": "sql/build/bm25_prepare.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 20000000000,
+      "statement_count": 7,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "bm25_status": {
+      "sql": "sql/build/bm25_status.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 20000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "historical_documents": "INT64",
+        "distinct_historical_keys": "INT64",
+        "distinct_historical_documents": "INT64",
+        "term_rows": "INT64",
+        "distinct_term_keys": "INT64",
+        "distinct_terms": "INT64",
+        "weight_rows": "INT64",
+        "source_posting_rows": "INT64",
+        "weighted_historical_documents": "INT64",
+        "weight_errors": "INT64",
+        "duplicate_weight_pairs": "INT64",
+        "term_frequency_errors": "INT64",
+        "score_cast_comparisons": "INT64",
+        "score_cast_errors": "INT64",
+        "reference_key_errors": "INT64",
+        "prepared_contract_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "index_create": {
+      "sql": "sql/build/index_create.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "index_status": {
+      "sql": "sql/build/index_status.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 104857600,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 2,
+      "fields": {
+        "index_name": "STRING",
+        "table_name": "STRING",
+        "index_status": "STRING",
+        "coverage_percentage": "INT64",
+        "unindexed_row_count": "INT64",
+        "last_refresh_time": "TIMESTAMP",
+        "disable_reason": "STRING"
+      }
+    },
+    "verify_prepare": {
+      "sql": "sql/build/verify_prepare.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 2000000000,
+      "statement_count": 11,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "verify_preparation_status": {
+      "sql": "sql/build/verify_preparation_status.sql",
+      "parameters": {
+        "contract_sha256": "STRING"
+      },
+      "maximum_bytes_billed": 2000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "query_documents": "INT64",
+        "distinct_query_documents": "INT64",
+        "query_inputs": "INT64",
+        "distinct_query_inputs": "INT64",
+        "reference_documents": "INT64",
+        "distinct_reference_requests": "INT64",
+        "query_binding_errors": "INT64",
+        "vector_errors": "INT64",
+        "missing_query_vectors": "INT64",
+        "reference_errors": "INT64",
+        "lexical_mapping_errors": "INT64",
+        "history_maturity_errors": "INT64",
+        "manifest_errors": "INT64",
+        "preparation_contract_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "live/install_expanded_function": {
+      "sql": "sql/live/install_expanded_function.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/intake_source": {
+      "sql": "sql/live/intake_source.sql",
+      "parameters": {
+        "as_of_utc": "TIMESTAMP",
+        "partition_end": "TIMESTAMP",
+        "partition_start": "TIMESTAMP",
+        "raw_limit": "INT64",
+        "sample_seed": "STRING",
+        "window_end": "TIMESTAMP",
+        "window_start": "TIMESTAMP"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 5,
+      "kind": "source",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/parse": {
+      "sql": "sql/live/parse.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/normalize": {
+      "sql": "sql/live/normalize.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/select_representatives": {
+      "sql": "sql/live/select_representatives.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 5,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/expanded_decisions": {
+      "sql": "sql/live/expanded_decisions.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 2,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/admitted_view": {
+      "sql": "sql/live/admitted_view.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/selection_status": {
+      "sql": "sql/live/selection_status.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "kind": "derived",
+      "max_result_rows": 1,
+      "fields": {
+        "sampled_raw_revisions": "INT64",
+        "normalized_revisions": "INT64",
+        "admissible_revisions": "INT64",
+        "normalization_rejected_revisions": "INT64",
+        "selected_canonical_documents": "INT64",
+        "expanded_documents": "INT64",
+        "excluded_no_match_documents": "INT64",
+        "excluded_no_theme_documents": "INT64",
+        "expanded_history_overlaps": "INT64",
+        "expanded_fresh_documents": "INT64",
+        "missing_for_500": "INT64"
+      }
+    },
+    "live/select_500_qualified": {
+      "sql": "sql/live/select_500_qualified.sql",
+      "parameters": {
+        "sample_seed": "STRING",
+        "window_end": "TIMESTAMP",
+        "window_start": "TIMESTAMP"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 4,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    },
+    "live/request_candidates": {
+      "sql": "sql/live/request_candidates.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 2,
+      "kind": "derived",
+      "max_result_rows": 0,
+      "fields": {}
+    }
+  },
+  "workflows": {
+    "corpus_setup": [
+      "schema",
+      "install_normalization",
+      "filter_fixture",
+      "normalization_fixture",
+      "frozen_inputs",
+      "market_paths",
+      "market_guard"
+    ],
+    "corpus_derive": [
+      "parse",
+      "normalize",
+      "representative_before_filter",
+      "expanded_decisions",
+      "filtered_representatives"
+    ],
+    "corpus_freeze": [
+      "quota_guard",
+      "membership",
+      "corpus",
+      "manifest",
+      "corpus_guard"
+    ],
+    "embedding_prepare": [
+      "dense_prepare/corpus-guard",
+      "dense_prepare/requests",
+      "dense_prepare/requests-guard",
+      "dense_prepare/cache-copy",
+      "dense_prepare/cache-guard",
+      "dense_prepare/inputs",
+      "dense_prepare/batches",
+      "dense_prepare/documents",
+      "dense_prepare/manifest",
+      "dense_prepare/raw",
+      "dense_prepare/preparation-guard"
+    ],
+    "embedding_publish": [
+      "dense_publish/preparation-guard",
+      "dense_publish/outputs-guard",
+      "dense_publish/membership-guard",
+      "dense_publish/vectors",
+      "dense_publish/final-guard"
+    ],
+    "lexical": [
+      "lexical_schema",
+      "lexical/document-lengths",
+      "lexical/postings",
+      "lexical/term-statistics",
+      "lexical/corpus-statistics",
+      "bm25_prepare"
+    ],
+    "index": [
+      "index_create"
+    ],
+    "verification_prepare": [
+      "verify_prepare"
+    ],
+    "live_prepare": [
+      "live/install_expanded_function",
+      "live/intake_source",
+      "live/parse",
+      "live/normalize",
+      "live/select_representatives",
+      "live/expanded_decisions",
+      "live/admitted_view",
+      "live/selection_status",
+      "live/select_500_qualified",
+      "live/request_candidates"
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+CREATE VECTOR INDEX filtered_dense_vector_index_v01 ON `${dataset}.filtered_dense_vectors_v01`(embedding) STORING(request_id, full_input_rank, first_corpus_rank) OPTIONS(index_type='IVF', distance_type='COSINE', ivf_options='{"num_lists":2048}');

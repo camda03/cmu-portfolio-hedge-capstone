@@ -1,0 +1,375 @@
+{
+  "stages": {
+    "evaluate_source_status": {
+      "sql": "sql/evaluate/source_status.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "expected_history_documents": "INT64",
+        "expected_history_inputs": "INT64",
+        "expected_lexical_terms": "INT64",
+        "expected_lexical_weight_rows": "INT64",
+        "expected_query_documents": "INT64",
+        "expected_query_inputs": "INT64",
+        "window_start": "TIMESTAMP"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "historical_documents": "INT64",
+        "distinct_historical_documents": "INT64",
+        "distinct_historical_inputs": "INT64",
+        "minimum_corpus_rank": "INT64",
+        "maximum_corpus_rank": "INT64",
+        "market_maturity_errors": "INT64",
+        "document_binding_errors": "INT64",
+        "missing_base_inputs": "INT64",
+        "query_documents": "INT64",
+        "distinct_query_documents": "INT64",
+        "query_inputs": "INT64",
+        "query_binding_errors": "INT64",
+        "query_vector_rows": "INT64",
+        "distinct_query_vectors": "INT64",
+        "query_document_uses": "INT64",
+        "query_vector_errors": "INT64",
+        "query_history_overlaps": "INT64",
+        "lexical_history_rows": "INT64",
+        "lexical_history_identities": "INT64",
+        "lexical_terms": "INT64",
+        "lexical_weight_rows": "INT64",
+        "lexical_mapping_errors": "INT64"
+      },
+      "kind": "source"
+    },
+    "evaluate_index_status": {
+      "sql": "sql/evaluate/index_status.sql",
+      "parameters": {
+        "dense_index_name": "STRING",
+        "dense_table_name": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "table_name": "STRING",
+        "index_name": "STRING",
+        "index_status": "STRING",
+        "coverage_percentage": "INT64",
+        "unindexed_row_count": "INT64",
+        "last_refresh_time": "TIMESTAMP",
+        "disable_reason": "STRING"
+      },
+      "kind": "source"
+    },
+    "evaluate_fixture": {
+      "sql": "sql/evaluate/fixture.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "fixture_queries": "INT64",
+        "fixture_unique_queries": "INT64",
+        "fixture_postings": "INT64",
+        "fixture_join_rows": "INT64",
+        "fixture_candidate_pairs": "INT64",
+        "fixture_output_pairs": "INT64",
+        "fixture_score_errors": "INT64",
+        "fixture_reuse_errors": "INT64",
+        "fixture_tie_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_prepare": {
+      "sql": "sql/evaluate/prepare.sql",
+      "parameters": {
+        "reference_seed": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_prepare_status": {
+      "sql": "sql/evaluate/prepare_status.sql",
+      "parameters": {
+        "reference_seed": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "query_documents": "INT64",
+        "distinct_query_documents": "INT64",
+        "unique_lexical_queries": "INT64",
+        "query_term_pairs": "INT64",
+        "distinct_query_term_pairs": "INT64",
+        "query_binding_errors": "INT64",
+        "term_binding_errors": "INT64",
+        "reference_documents": "INT64",
+        "reference_distinct_documents": "INT64",
+        "reference_unique_inputs": "INT64",
+        "reference_binding_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_ivf40": {
+      "sql": "sql/evaluate/ivf40.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "request_k": "INT64"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 3,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_ivf40_status": {
+      "sql": "sql/evaluate/ivf40_status.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "request_k": "INT64"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "query_requests": "INT64",
+        "request_pairs": "INT64",
+        "document_pairs": "INT64",
+        "query_documents": "INT64",
+        "duplicate_document_pairs": "INT64",
+        "duplicate_request_pairs": "INT64",
+        "queries_with_wrong_count": "INT64",
+        "missing_queries": "INT64",
+        "unexpected_queries": "INT64",
+        "unexpected_history": "INT64",
+        "self_matches": "INT64",
+        "invalid_distances": "INT64",
+        "invalid_ranks": "INT64",
+        "ordering_errors": "INT64",
+        "distinct_candidate_sets": "INT64",
+        "identical_input_matches": "INT64",
+        "request_binding_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_bm25": {
+      "sql": "sql/evaluate/bm25.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL"
+      },
+      "maximum_bytes_billed": 30000000000,
+      "statement_count": 3,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_bm25_status": {
+      "sql": "sql/evaluate/bm25_status.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "match_pairs": "INT64",
+        "query_documents_with_matches": "INT64",
+        "query_documents_without_matches": "INT64",
+        "queries_with_wrong_count": "INT64",
+        "duplicate_pairs": "INT64",
+        "invalid_scores": "INT64",
+        "invalid_exact_scores": "INT64",
+        "display_score_errors": "INT64",
+        "invalid_ranks": "INT64",
+        "unexpected_queries": "INT64",
+        "unexpected_history": "INT64",
+        "self_matches": "INT64",
+        "ordering_errors": "INT64",
+        "identical_input_matches": "INT64",
+        "request_binding_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_fusion": {
+      "sql": "sql/evaluate/fusion.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 1,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_matches_status": {
+      "sql": "sql/evaluate/matches_status.sql",
+      "parameters": {},
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "completed_query_documents": "INT64",
+        "candidate_pairs": "INT64",
+        "cosine_candidate_pairs": "INT64",
+        "bm25_candidate_pairs": "INT64",
+        "both_channel_pairs": "INT64",
+        "duplicate_pairs": "INT64",
+        "invalid_fusion": "INT64",
+        "missing_queries": "INT64",
+        "unexpected_queries": "INT64",
+        "unexpected_history": "INT64",
+        "distinct_candidate_sets": "INT64",
+        "channel_binding_errors": "INT64",
+        "ordering_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_exact": {
+      "sql": "sql/evaluate/exact.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "request_k": "INT64"
+      },
+      "maximum_bytes_billed": 100000000000,
+      "statement_count": 3,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_exact_status": {
+      "sql": "sql/evaluate/exact_status.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "request_k": "INT64"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "query_requests": "INT64",
+        "request_pairs": "INT64",
+        "document_pairs": "INT64",
+        "query_documents": "INT64",
+        "duplicate_document_pairs": "INT64",
+        "duplicate_request_pairs": "INT64",
+        "queries_with_wrong_count": "INT64",
+        "missing_queries": "INT64",
+        "unexpected_queries": "INT64",
+        "unexpected_history": "INT64",
+        "self_matches": "INT64",
+        "invalid_distances": "INT64",
+        "invalid_ranks": "INT64",
+        "ordering_errors": "INT64",
+        "distinct_candidate_sets": "INT64",
+        "identical_input_matches": "INT64",
+        "request_binding_errors": "INT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_accuracy": {
+      "sql": "sql/evaluate/accuracy.sql",
+      "parameters": {
+        "exclude_identical_inputs": "BOOL",
+        "minimum_mean_recall": "FLOAT64",
+        "minimum_query_recall": "FLOAT64"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "query_documents": "INT64",
+        "sample_unique_requests": "INT64",
+        "evaluated_query_documents": "INT64",
+        "exact_pairs": "INT64",
+        "ann_pairs": "INT64",
+        "overlap_pairs": "INT64",
+        "mean_recall_at_20": "FLOAT64",
+        "minimum_recall_at_20": "FLOAT64",
+        "p05_recall_at_20": "FLOAT64",
+        "p50_recall_at_20": "FLOAT64",
+        "full_recall_queries": "INT64",
+        "top1_identity_agreement_queries": "INT64",
+        "top1_identity_agreement_rate": "FLOAT64",
+        "mean_best_distance_gap": "FLOAT64",
+        "maximum_best_distance_gap": "FLOAT64",
+        "queries_below_80pct_recall": "INT64",
+        "queries_below_95pct_recall": "INT64",
+        "top1_distance_agreement_queries": "INT64",
+        "top1_distance_agreement_rate": "FLOAT64",
+        "mean_distance_tolerant_recall_at_20": "FLOAT64",
+        "queries_with_top1_ties_in_exact20": "INT64",
+        "queries_with_cutoff_ties_in_exact20": "INT64",
+        "comparison_distance_tolerance": "FLOAT64"
+      },
+      "kind": "derived"
+    },
+    "evaluate_reports": {
+      "sql": "sql/evaluate/reports.sql",
+      "parameters": {
+        "performance_json": "STRING",
+        "report_context_json": "STRING",
+        "run_id": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 2,
+      "max_result_rows": 0,
+      "fields": {},
+      "kind": "derived"
+    },
+    "evaluate_reports_status": {
+      "sql": "sql/evaluate/reports_status.sql",
+      "parameters": {
+        "run_id": "STRING"
+      },
+      "maximum_bytes_billed": 10000000000,
+      "statement_count": 3,
+      "max_result_rows": 1,
+      "fields": {
+        "report_pages": "INT64",
+        "distinct_report_pages": "INT64",
+        "best_match_pages": "INT64",
+        "market_pages": "INT64",
+        "performance_pages": "INT64",
+        "report_identity_errors": "INT64",
+        "report_content_errors": "INT64",
+        "total_report_html_bytes": "INT64",
+        "maximum_report_page_bytes": "INT64",
+        "reported_query_articles": "INT64",
+        "distinct_reported_query_articles": "INT64",
+        "distinct_reported_query_ranks": "INT64",
+        "report_case_errors": "INT64",
+        "market_voted_queries": "INT64",
+        "market_total_votes": "FLOAT64",
+        "market_horizons": "INT64",
+        "market_dates": "INT64",
+        "distinct_market_horizons": "INT64",
+        "first_market_horizon": "INT64",
+        "last_market_horizon": "INT64",
+        "market_path_errors": "INT64"
+      },
+      "kind": "derived"
+    }
+  },
+  "workflows": {
+    "evaluate": [
+      "evaluate_source_status",
+      "evaluate_index_status",
+      "evaluate_fixture",
+      "evaluate_prepare",
+      "evaluate_prepare_status",
+      "evaluate_ivf40",
+      "evaluate_ivf40_status",
+      "evaluate_bm25",
+      "evaluate_bm25_status",
+      "evaluate_fusion",
+      "evaluate_matches_status",
+      "evaluate_exact",
+      "evaluate_exact_status",
+      "evaluate_accuracy",
+      "evaluate_reports",
+      "evaluate_reports_status"
+    ]
+  }
+}

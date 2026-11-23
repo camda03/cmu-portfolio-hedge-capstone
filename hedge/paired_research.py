@@ -86,12 +86,81 @@ def gdelt_input(folder, cutoff, allow_fixture):
         receipt["source_receipt"].get("synthetic")
         or handoff["evidence_summary"]["context"].get("synthetic")
     )
-    require(allow_fixture or not fixture, "Synthetic GDELT evidence cannot establish a real rehearsal.")
+    require(
+        allow_fixture or not fixture, "Synthetic GDELT evidence cannot establish a real rehearsal."
+    )
     window = scope["observation_window"]
     require(
-        handoff["delivery_created_at"] and report["created_at"], "Missing delivery or report timestamp."
+        handoff["delivery_created_at"] and report["created_at"],
+        "Missing delivery or report timestamp.",
     )
-    for stamp in (handoff["delivery_created_at"], report["created_at"], window["end"], window["as_of"]):
+    for stamp in (
+        handoff["delivery_created_at"],
+        report["created_at"],
+        window["end"],
+        window["as_of"],
+    ):
         if stamp:
             require(instant(stamp) <= cutoff, "GDELT input postdates decision time.")
     return handoff, sha256(delivery_bytes).hexdigest(), fixture
+
+
+def archived_analysts(analyst_file, cutoff):
+    raw = analyst_file.read_bytes()
+    feed = json.loads(raw)
+    require(
+        feed["schema"] == "portfolio-research-v1"
+        and feed["execute"] is False
+        and feed["all_reports_available"] is True
+        and feed["fleet"]["test_id"]
+        and set(feed["subjects"]) == {"AAPL", "DE", "DELL", "MSFT", "NVDA", "WMT", "SP500"},
+        "Expected the complete seven-subject portfolio research feed.",
+    )
+    require(instant(feed["generated_at"]) <= cutoff, "Analyst feed postdates decision time.")
+    for symbol, subject in feed["subjects"].items():
+        forecast = subject["forecast"]
+        require(
+            subject["symbol"] == forecast["symbol"] == symbol
+            and subject["status"] == "available"
+            and subject["report_markdown"].strip()
+            and forecast["forecast_id"],
+            f"Missing accepted research for {symbol}.",
+        )
+        require(
+            instant(forecast["issued_at"]) <= cutoff
+            and instant(forecast["information_cutoff"]) <= cutoff,
+            f"Forecast postdates decision time for {symbol}.",
+        )
+        monitor = subject["last_completed_monitor"]
+        if monitor:
+            require(
+                monitor["symbol"] == symbol and instant(monitor["received_at"]) <= cutoff,
+                f"Monitor identity or decision time mismatch for {symbol}.",
+            )
+        if monitor and monitor["applies_to_active_forecast"]:
+            require(
+                monitor["forecast_id"] == forecast["forecast_id"], f"Misbound monitor for {symbol}."
+            )
+    return feed, sha256(raw).hexdigest()
+
+
+def paired_research(folder, analyst_file, book, cutoff, allow_fixture=False):
+    handoff, delivery_hash, fixture = gdelt_input(folder, cutoff, allow_fixture)
+    feed, analyst_hash = archived_analysts(analyst_file, cutoff)
+    return {
+        "schema": "portfolio-paired-research-v1",
+        "as_of": cutoff.isoformat(),
+        "synthetic_gdelt": fixture,
+        "execute": False,
+        "decision_instruction": (
+            "Assess the broad market and the held basket separately. Explain whether you use, downweight, "
+            "combine or decline each source. Cite the GDELT run, its observation window and limitations, "
+            "and relevant analyst forecast IDs, horizons and SOL coverage. Recheck age at decision time. "
+            "Treat historical return paths as descriptive. Record the implications for the simulated "
+            "hedge and what would change your view. This evidence read supplies no execution quote."
+        ),
+        "portfolio": book,
+        "analysts": feed,
+        "gdelt": handoff,
+        "input_sha256": {"handoff.json": delivery_hash, "portfolio_research": analyst_hash},
+    }

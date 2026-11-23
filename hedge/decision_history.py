@@ -38,7 +38,9 @@ def remember_mark(db, market, available):
     if close and (q.get("mode") != "HISTORICAL_CLOSE" or not q.get("is_close")):
         return
     if not close and (
-        q.get("mode") != "REALTIME" or q.get("is_close") is not False or q.get("halted") is not False
+        q.get("mode") != "REALTIME"
+        or q.get("is_close") is not False
+        or q.get("halted") is not False
     ):
         return
     observed = q.get("valuation_at" if close else "observed_at")
@@ -75,7 +77,9 @@ def archive(db, folder):
     p = read("request.json")
     if p["market"].get("synthetic"):
         return
-    when = max(instant(memo["completed_at"]), instant(memo.get("recorded_at", memo["completed_at"])))
+    when = max(
+        instant(memo["completed_at"]), instant(memo.get("recorded_at", memo["completed_at"]))
+    )
     market, table = p["market"], p["alternatives"]
     contract = market["contract"]
     target, before = memo["target_contracts"], memo["current_contracts"]
@@ -94,6 +98,9 @@ def archive(db, folder):
         or p.get("intended_session")
         or instant(p["as_of"]).astimezone(EASTERN).date().isoformat()
     )
+    price_session = market.get("session_date")
+    if p.get("prior_paper_decision"):
+        day = instant(p["as_of"]).astimezone(EASTERN).date().isoformat()
     freshness = p.get("source_freshness")
     if freshness is None and "analysts" in p:
         from source_dates import source_dates
@@ -119,6 +126,7 @@ def archive(db, folder):
         "id": key,
         "time": when.isoformat(),
         "session": day,
+        "price_session": price_session,
         "basis": basis,
         "contract": contract,
         "previous": before,
@@ -232,7 +240,10 @@ def model_experience(path, now, market):
     for result in ("Helped", "Cost", "Neutral"):
         older = (row for row in rows[24:] if row["outcome"] and row["outcome"]["result"] == result)
         examples.extend(list(islice(older, 2)))
-    return {"prior_decision_outcomes": examples, "prior_record_counts": {"total": len(rows), **counts}}
+    return {
+        "prior_decision_outcomes": examples,
+        "prior_record_counts": {"total": len(rows), **counts},
+    }
 
 
 def complete(folder, path, now):
