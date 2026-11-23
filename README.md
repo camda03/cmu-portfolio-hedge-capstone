@@ -41,8 +41,12 @@ PY
 
 ## Running the services
 
-The calculation above needs only the Python standard library. The [research viewer](analysts/dashboard/app.py) also supports a local record directory. In a separate environment, install [its dependencies](analysts/dashboard/requirements.txt) and set `REPORT_STORE` to the directory containing published records.
+The fee calculation above needs only the Python standard library. To run the [research viewer](analysts/dashboard/app.py) locally, install [its dependencies](analysts/dashboard/requirements.txt) in a separate environment. Set `REPORT_STORE` to the directory containing your published records. From the repository root, run `python -m flask --app analysts/dashboard/app.py run`.
 
-The live workflows use separate environments for the [analyst worker](analysts/worker/reassessment_requirements.txt), [BigQuery pipeline](gdelt/requirements.txt), [GDELT reader](gdelt/requirements-research.txt) and [hedge worker](hedge/requirements-hedge.txt). An operator supplies authorized model and read-only market-data access, Google Cloud resources, an opening paper book, and dated inputs. The Cloud Storage and research dashboard locations are configured with `HEDGE_RESEARCH_STORE` and `RESEARCH_DASHBOARD_URL`. The [BigQuery defaults](gdelt/runtime_defaults.json) use the operator’s project, baseline dataset and reservation. The [GDELT study](desk/gdelt/study.html) and Hedge Desk pages are source templates. Their JSON slots receive published records at rendering time.
+The [GDELT study](desk/gdelt/study.html) and Hedge Desk pages are source templates. The running demo fills them with dated analyst reports, news evidence and paper decisions. The private records and credentials stay with the installation.
+
+To start a fresh paper ledger, supply your own `hedge/opening.json` with the opening balances used by the [ledger](hedge/ledger.py). An existing SQLite ledger already holds those balances. You can inspect it with `python hedge/ledger.py --db /path/to/book.sqlite3 status` or supply it to a closing run with `--book`.
+
+The live workflows use separate environments for the [analyst worker](analysts/worker/reassessment_requirements.txt), [BigQuery pipeline](gdelt/requirements.txt), [GDELT reader](gdelt/requirements-research.txt) and [hedge worker](hedge/requirements-hedge.txt). An operator supplies authorized model and read-only market-data access and Google Cloud resources. Set `HEDGE_RESEARCH_STORE` and `RESEARCH_DASHBOARD_URL` for the report handoff. The [BigQuery configuration](gdelt/runtime_defaults.json) takes `GOOGLE_CLOUD_PROJECT` and `GDELT_BASELINE_DATASET` (`project.dataset`). The runner takes its reservation from `GDELT_RESERVATION`.
 
 ChatGPT and Codex assisted with development and editing.
