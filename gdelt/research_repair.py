@@ -11,15 +11,18 @@ from research_disclosure import disclosure
 from research_evidence import load_evidence
 
 
+# Reject the repair when a required piece of evidence fails validation.
 def check(condition, message):
     if not condition:
         raise ValueError(message)
 
 
+# Fingerprint the exact bytes of the evidence or response being repaired.
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
+# Tie the citation correction to the rejected response and its original evidence.
 def prepare_repair(folder):
     """Bind a citation correction to its rejected response and original evidence before another request."""
     folder = Path(folder).resolve()

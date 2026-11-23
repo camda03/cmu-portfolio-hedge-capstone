@@ -53,10 +53,12 @@ CODE = tuple(
 )
 
 
+# Hash a research record in its compact JSON representation.
 def sha(value):
     return digest(live.compact(value))
 
 
+# Write a new record or confirm that its existing contents are identical.
 def immutable(path, value):
     if path.exists() and read(path) != value:
         raise ValueError("Existing checkpoint differs: " + path.name)
@@ -64,6 +66,7 @@ def immutable(path, value):
         write(path, dump(value))
 
 
+# Save the watch list and supporting inputs before a worker can use this generation.
 def generation(folder, watch, state, report):
     """Commit inputs before making this generation eligible for dispatch."""
     state = dict(state, watch_sha256=sha(watch))
@@ -84,6 +87,7 @@ def generation(folder, watch, state, report):
         write(folder / "state.json", state)
 
 
+# Check the generation's manifest against the inputs and return its watch list.
 def verify(folder, *, model=delta.MODEL):
     manifest, watch = read(folder / "manifest.json"), read(folder / "watch.json")
     if (
@@ -97,6 +101,7 @@ def verify(folder, *, model=delta.MODEL):
     return watch
 
 
+# Determine how many hourly checks must pass before dispatch is allowed.
 def initial_cycles_required(source, current):
     """A failed predecessor is retained as failed; its replacement proves two slots first."""
     if source["state"].get("requires_review") or source["state"].get("pending_cycle"):
@@ -156,6 +161,7 @@ def initial_cycles_required(source, current):
     return 2
 
 
+# Import the completed pilot evidence and open a bounded reassessment window.
 def prepare(folder, source_file, now=None):
     """Import the completed pilot export once, with a new bounded window."""
     source = read(source_file)
@@ -214,6 +220,7 @@ def prepare(folder, source_file, now=None):
         immutable(folder / "plan.json", plan)
 
 
+# Check that the saved dispatch and terminal response identify the same failed hour.
 def settled_overload(target, result, watch, *, model=delta.MODEL):
     """Admit a failed hour only when the saved dispatch, baseline and terminal response agree."""
     if (
@@ -255,6 +262,7 @@ def settled_overload(target, result, watch, *, model=delta.MODEL):
     )
 
 
+# Recover the recorded outcome and publication for work that already finished.
 def accepted_state(folder, store):
     """Recover terminal state and publication without repeating model submissions."""
     watch = verify(folder)
@@ -283,6 +291,7 @@ def accepted_state(folder, store):
     return watch, state
 
 
+# Gather outstanding referrals into the analyst's next reassessment request.
 def trigger_for(folder, current, state):
     """Package all unconsidered requests, not a hard-coded historical referral."""
     watch = verify(current)
@@ -358,6 +367,7 @@ class PriceCollectionError(ValueError):
     """The daily worker stopped while collecting prices, before the analyst process."""
 
 
+# Run discovery and the seven analyst stages for the requested subject.
 def native(job, trigger=None, symbol=None, *, daily=False):
     """Shared SOL discovery plus the existing seven stages; no automatic retry."""
     symbol = trigger["symbol"] if trigger else symbol
@@ -463,6 +473,7 @@ def native(job, trigger=None, symbol=None, *, daily=False):
     return runs[0].parent
 
 
+# Build the next watch list and starting state from the returned analyst forecast.
 def successor(watch, state, forecast, trigger):
     handoff, dispositions = check_return_output(forecast, trigger)
     from analyst_discovery import checks_for
@@ -527,6 +538,7 @@ def successor(watch, state, forecast, trigger):
     return new_watch, seed
 
 
+# Map each durable output file to its content hash for later verification.
 def evidence_files(output):
     return {
         str(p.relative_to(output)): digest(p.read_bytes())
@@ -535,6 +547,7 @@ def evidence_files(output):
     }
 
 
+# Validate the returned research and publish the next watch generation.
 def adopt(folder, store, watch, state, job, output):
     trigger, forecast = read(job / "trigger.json"), read(output / "forecast.json")
     attempt = read(job / "attempt.json")
@@ -631,6 +644,7 @@ def adopt(folder, store, watch, state, job, output):
     )
 
 
+# Save and publish the reassessment worker's status and reason.
 def health(folder, store, status, reason, **extra):
     plan = read(folder / "plan.json")
     value = dict(
@@ -670,12 +684,14 @@ def health(folder, store, status, reason, **extra):
     return value
 
 
+# Find the hourly interval containing the supplied time within this plan.
 def slot_start(plan, clock):
     start = live.instant(plan["starts_at"])
     hour = timedelta(hours=1)
-    return start + ((clock - start) // hour) * hour
+    return start + ((clock - start) // hour) * hour  # Round down relative to the plan start.
 
 
+# Advance the current hour, including referrals and any eligible reassessment.
 def tick(
     folder, store, now=None, client=None, analyst=native, broker=True, dispatch=True, recover=False
 ):
@@ -944,6 +960,7 @@ def tick(
     )
 
 
+# Parse the worker command and run the requested preparation or monitoring step.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("prepare", "check", "tick", "recover"))

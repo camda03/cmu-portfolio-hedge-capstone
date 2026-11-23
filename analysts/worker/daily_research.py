@@ -19,14 +19,16 @@ DASHBOARD = os.environ.get("RESEARCH_DASHBOARD_URL", "").rstrip("/")
 PARALLEL_SUBJECTS = 2
 
 
+# Create the dated storage record, accepting a repeat only when its contents match.
 def publish_once(store, key, value):
     try:
-        store.put(key, value, 0)
+        store.put(key, value, 0)  # Generation zero means the object must be new.
     except PreconditionFailed:
         if store.get(key)[0] != value:
             raise ValueError("Different content already exists at " + key)
 
 
+# Freeze all seven accepted reports into one packet and return its storage receipt.
 def publish_packet(root, staged, store, plan):
     """Freeze the seven accepted reports together so a later run cannot change one member of this batch."""
     path = root / "portfolio-research.json"
@@ -100,6 +102,7 @@ def publish_packet(root, staged, store, plan):
     )
 
 
+# Combine each model call's receipt and price estimate into the daily cost record.
 def accounting(root):
     calls, errors = {}, {}
     for symbol in ENABLED:
@@ -139,6 +142,7 @@ def accounting(root):
     )
 
 
+# Summarize a symbol's current research stage from its saved calls and results.
 def stage(root, symbol):
     job = root / symbol / "baseline"
     log = job / "native.log"
@@ -173,6 +177,7 @@ def stage(root, symbol):
     )
 
 
+# Archive the failed price check before allowing another attempt for the same date.
 def price_hold(root, session, store):
     """Preserve the original pre-model failure before a new attempt for the same date."""
     status = read(root / "status.json")
@@ -206,6 +211,7 @@ def price_hold(root, session, store):
     return status["run_id"]
 
 
+# Coordinate the dated research batch and publish its status, reports, and costs.
 def run(root, session, revision, store, analyst=None, interval=30, recover_prices=False):
     if research.live.MODEL_PROFILE != "6.2" or date.fromisoformat(session).isoformat() != session:
         raise ValueError("A New York session date and the approved 6.2 model profile are required.")
@@ -258,6 +264,7 @@ def run(root, session, revision, store, analyst=None, interval=30, recover_price
             execute=False,
         )
 
+        # Save the latest progress locally and publish it against the last storage generation.
         def checkpoint(first=False):
             nonlocal generation
             state["updated_at"] = stamp()
@@ -355,6 +362,7 @@ def run(root, session, revision, store, analyst=None, interval=30, recover_price
         return state
 
 
+# Recover publication of an existing daily batch from its saved results.
 def republish(root, session, revision, store):
     # No model-capable functions are reachable from this recovery path.
     with (root / ".runner.lock").open("a") as lock:

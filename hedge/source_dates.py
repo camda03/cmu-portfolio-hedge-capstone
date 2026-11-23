@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from ledger import EASTERN, instant
 
 
+# Parse an optional source timestamp, returning no date when the value cannot be read.
 def dated(value, parse):
     try:
         return parse(value) if value else None
@@ -13,6 +14,7 @@ def dated(value, parse):
         return None
 
 
+# Evaluate the age of each decision input against the relevant exchange session.
 def source_dates(inputs):
     import pandas_market_calendars as calendars
 
@@ -25,10 +27,11 @@ def source_dates(inputs):
     )
     exchange = calendars.get_calendar("NYSE")
     days = exchange.valid_days(session - timedelta(days=16), session - timedelta(days=1))
-    prior = days[-1].date()
+    prior = days[-1].date()  # Use the last trading day across weekends and holidays.
     closing = market.get("price_mode") == "last_close_rehearsal"
     rows = []
 
+    # Append one source's timestamp, freshness status, and explanation to the display.
     def add(group, name, stamp, received, horizon, status, reason):
         rows.append(
             {

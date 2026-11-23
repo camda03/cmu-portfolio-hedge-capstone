@@ -1,3 +1,4 @@
+-- Identify the expanded filter rules matched by the normalized GKG labels.
 CREATE OR REPLACE FUNCTION `${dataset}.gkg_expanded_rule_ids_v01`(labels ARRAY<STRING>) RETURNS ARRAY<STRING> AS (
                                                                                                                     (WITH normalized AS
                                                                                                                        (SELECT ARRAY

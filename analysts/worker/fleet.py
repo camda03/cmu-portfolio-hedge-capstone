@@ -29,6 +29,7 @@ CODE = tuple(
 )
 
 
+# Create the fleet plan that binds this research series to its subjects and release.
 def initialize(root, series, release):
     root.mkdir(parents=True, exist_ok=True)
     with (root / ".setup.lock").open("a") as lock:
@@ -61,6 +62,7 @@ def initialize(root, series, release):
         return plan
 
 
+# Check that the saved fleet plan still matches its recorded settings.
 def verify(root):
     plan = read(root / "plan.json")
     if (
@@ -88,6 +90,7 @@ def verify(root):
     return plan
 
 
+# Validate a completed forecast and assemble the baseline needed by its consumer.
 def baseline_source(symbol, output, *, for_monitor=True):
     forecast = read(output / "forecast.json")
     report = (output / "report.md").read_text()
@@ -187,6 +190,7 @@ def baseline_source(symbol, output, *, for_monitor=True):
     )
 
 
+# Run or recover one subject's baseline and publish its accepted evidence.
 def build_one(root, symbol, store, analyst=research.native, *, for_monitor=True):
     job = root / symbol / "baseline"
     if not (job / "completed.json").exists():
@@ -248,6 +252,7 @@ def build_one(root, symbol, store, analyst=research.native, *, for_monitor=True)
     research.immutable(job / "published.json", dict(key=key, forecast_id=forecast["forecast_id"]))
 
 
+# Check the subject's price input before spending resources on analyst calls.
 def preflight_price(root, symbol):
     folder = root / symbol
     folder.mkdir(parents=True, exist_ok=True)
@@ -272,6 +277,7 @@ def preflight_price(root, symbol):
         )
 
 
+# Check prices across the fleet and build the initial analyst baselines.
 def bootstrap(root, store, analyst=research.native, price_check=preflight_price):
     plan = verify(root)
     with (root / ".bootstrap.lock").open("a") as lock:
@@ -282,6 +288,7 @@ def bootstrap(root, store, analyst=research.native, price_check=preflight_price)
             raise ValueError("Baseline preparation window expired; no new requests allowed.")
 
         # All seven data permissions are checked before paying for the first analyst run.
+        # Run one subject's price check and return any failure to the fleet coordinator.
         def prices(symbol):
             try:
                 price_check(root, symbol)
@@ -297,6 +304,7 @@ def bootstrap(root, store, analyst=research.native, price_check=preflight_price)
                 "Broker-history preflight failed; inspect preflight.json and the named symbol logs. No baselines submitted."
             )
 
+        # Build one subject's baseline and report any failure alongside its symbol.
         def build(symbol):
             try:
                 if research.live.instant(stamp()) >= research.live.instant(
@@ -329,6 +337,7 @@ def bootstrap(root, store, analyst=research.native, price_check=preflight_price)
         enroll(root, store)
 
 
+# Register subjects with accepted baselines for the fleet's monitoring window.
 def enroll(root, store):
     plan, window = verify(root), read(root / "window.json")
     for symbol in plan["symbols"]:
@@ -349,6 +358,7 @@ def enroll(root, store):
             research.tick(session, store, dispatch=False)
 
 
+# Advance the monitoring session for one enrolled subject.
 def tick(root, symbol, store):
     plan = verify(root)
     if symbol not in plan["symbols"]:

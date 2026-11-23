@@ -54,10 +54,12 @@ SCHEMA = {
 }
 
 
+# Read a saved hedge-session record from its JSON file.
 def read_json(path):
     return json.loads(Path(path).read_bytes())
 
 
+# Write a complete session artifact before replacing its destination.
 def save(path, value):
     """Atomic private file replacement in its destination directory."""
     with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False) as out:
@@ -70,6 +72,7 @@ def save(path, value):
             temporary.unlink(missing_ok=True)
 
 
+# Read the exact bytes of a research object from local storage or Cloud Storage.
 def object_bytes(location):
     if str(location).startswith("gs://"):
         # On the worker the storage client uses its attached service identity.
@@ -99,6 +102,7 @@ def object_bytes(location):
     return Path(location).read_bytes()
 
 
+# Confirm the research receipt is complete, dated correctly, and available by the cutoff.
 def check_receipt(receipt, batch, cutoff):
     run = receipt["run_id"]
     require(
@@ -111,6 +115,7 @@ def check_receipt(receipt, batch, cutoff):
     )
 
 
+# Use the worker's attached identity to retrieve the dated receipt and research packet.
 def worker_delivery(day, cutoff, account):
     """Use the VM's attached identity for both reads, including an authorized storage fallback."""
     from google.auth.compute_engine import Credentials
@@ -123,6 +128,7 @@ def worker_delivery(day, cutoff, account):
         "Configure RESEARCH_DASHBOARD_URL and HEDGE_RESEARCH_STORE for worker delivery.",
     )
 
+    # Obtain credentials for the worker identity and verify its service-account address.
     def attached(scopes):
         credentials = Credentials(scopes=scopes)
         credentials.refresh(Request())
@@ -132,6 +138,7 @@ def worker_delivery(day, cutoff, account):
         )
         return credentials
 
+    # Check the receipt and return the permitted storage key for the research packet.
     def packet_key(receipt):
         check_receipt(receipt, day, cutoff)
         run = receipt["run_id"]
@@ -155,6 +162,7 @@ def worker_delivery(day, cutoff, account):
     else:
         with AuthorizedSession(credentials) as session:
 
+            # Fetch the dashboard response with the worker's authenticated session.
             def get(url):
                 return session.get(
                     url, headers={"Accept": "application/json"}, allow_redirects=False, timeout=30
@@ -185,6 +193,7 @@ def worker_delivery(day, cutoff, account):
     return receipt | {"hedge_read": meta | {"transport": "cloud_storage"}}, raw
 
 
+# Resolve the research receipt and packet supplied for a file-based review.
 def research_files(receipt_location, batch, cutoff, packet_file):
     if receipt_location is None:
         day = date.fromisoformat(batch).isoformat()
@@ -206,6 +215,7 @@ def research_files(receipt_location, batch, cutoff, packet_file):
     return receipt, object_bytes(packet_file)
 
 
+# Load the daily research, check its hash, and verify the seven accepted reports.
 def daily_packet(receipt_location, batch, cutoff, packet_file=None):
     account = os.environ.get("HEDGE_WORKER_ACCOUNT")
     if account:
@@ -267,6 +277,7 @@ def daily_packet(receipt_location, batch, cutoff, packet_file=None):
     return receipt, feed
 
 
+# Find the exchange session containing the hedge decision's timestamp.
 def session_hours(now, session):
     import pandas_market_calendars as mcal
 
@@ -281,6 +292,7 @@ def session_hours(now, session):
     return start.to_pydatetime(), end.to_pydatetime()
 
 
+# Value the paper portfolio at the supplied prices and return the ledger statement.
 def marked_book(db, seed, market, cutoff, opening, max_age):
     require(
         market.get("price_mode") != "last_close_rehearsal",
@@ -334,6 +346,7 @@ def marked_book(db, seed, market, cutoff, opening, max_age):
     return statement(seed, events), valuation
 
 
+# Assemble the verified research, market snapshot, portfolio, and hedge alternatives.
 def prepare(receipt, feed, gdelt, gdelt_hash, book, market, policy, cutoff):
     contract = market["contract"]
     targets = policy["targets"]
@@ -396,6 +409,7 @@ def prepare(receipt, feed, gdelt, gdelt_hash, book, market, policy, cutoff):
     )
 
 
+# Build the model request while storing repeated research URL annotations only once.
 def model_payload(inputs):
     """Represent repeated search URL annotations once across the original coverage maps."""
     wire = deepcopy(inputs)
@@ -427,6 +441,7 @@ def model_payload(inputs):
     return wire
 
 
+# Run the hedge review with its instructions and calculator, then validate the response.
 def model_review(inputs, client, response_path=None):
     prompt = (ROOT / "hedge_prompt.md").read_text()
     research = json.dumps(
@@ -500,6 +515,7 @@ def model_review(inputs, client, response_path=None):
     return reviewed_response(inputs, response, prompt)
 
 
+# Check the model's decision and derive the implied change in the futures position.
 def reviewed_response(inputs, response, prompt):
     require(
         response["status"] == "completed" and response["output_text"], "Incomplete model response."
@@ -547,6 +563,7 @@ def reviewed_response(inputs, response, prompt):
     )
 
 
+# Choose the verification or decision workflow and write its requested artifacts.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -573,6 +590,7 @@ def main():
         review.add_argument("--" + name, type=Path, required=True)
     review.add_argument("--session", required=True, help="intended New York trading date")
     args = parser.parse_args()
+    # Read the current UTC time when a step needs its own timestamp.
     clock = lambda: datetime.now(timezone.utc)
     receipt, feed = daily_packet(args.receipt, args.batch, clock(), args.packet)
     if args.command == "check":

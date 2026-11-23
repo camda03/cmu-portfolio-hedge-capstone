@@ -25,22 +25,25 @@ NOTES = (
 )
 
 
+# Stop the batch when a required input or result fails its check.
 def check(ok, message):
     if not ok:
         raise ValueError(message)
 
 
+# Identify the exact driver and SQL files used by the GDELT batch.
 def fingerprint():
     paths = [Path(__file__), *sorted((ROOT / "demo_sql").glob("*.sql"))]
     return hashlib.sha256(b"\n".join(p.read_bytes() for p in paths)).hexdigest()
 
 
+# Choose a complete UTC news hour or validate the hour supplied by the caller.
 def closed_hour(value=None):
     now = datetime.now(timezone.utc)
     start = (
         datetime.fromisoformat(value.replace("Z", "+00:00"))
         if value
-        else (now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=2))
+        else (now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=2))  # Leave a full hour for ingestion.
     )
     check(start.tzinfo is not None, "The news-window start needs an explicit UTC offset.")
     start = start.astimezone(timezone.utc)
@@ -48,6 +51,7 @@ def closed_hour(value=None):
     return start.isoformat()
 
 
+# Register the demo's selection, embedding, and publication steps with the runner.
 def stages(runner):
     # Names, statement ceilings and scalar result schemas use the existing runner.
     for name, statements, fields, params in [
@@ -68,6 +72,7 @@ def stages(runner):
         }
 
 
+# Use the existing index to retrieve analogs and publish reports for a news hour.
 def run_batch(args):
     import run as engine  # Reuse durable job IDs, budgets, retrieval SQL and report calculations.
 
@@ -176,6 +181,7 @@ def run_batch(args):
         demo.evaluate()
 
 
+# Run the small BigQuery check that exercises the demo's retrieval setup.
 def smoke(args):
     import run as engine
 
@@ -193,6 +199,7 @@ def smoke(args):
         )
 
 
+# Extract the summary and article pairs embedded in the stored report pages.
 def packets(pages):
     """Expose the exact numeric payloads used by the existing HTML reports."""
     parsed = {}
@@ -249,9 +256,11 @@ def packets(pages):
     return summary, cases
 
 
+# Add an evidence endpoint to the existing report viewer.
 def evidence_app(pages, base, headers):
     summary, cases = packets(pages)
 
+    # Return the requested evidence selection or pass the request to the report viewer.
     def serve(environ, start_response):
         if environ.get("PATH_INFO") != "/evidence":
             return base(environ, start_response)
@@ -299,6 +308,7 @@ def evidence_app(pages, base, headers):
     return serve
 
 
+# Check the published pages and export or serve the corresponding reports.
 def outputs(args):
     import view_reports as viewer
     from google.cloud import bigquery
@@ -344,6 +354,7 @@ def outputs(args):
         server.serve_forever()
 
 
+# Read the command line and run the selected GDELT batch or reporting operation.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["run", "smoke", "serve", "export"])

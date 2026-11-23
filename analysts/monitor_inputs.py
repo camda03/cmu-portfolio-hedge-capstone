@@ -15,6 +15,7 @@ CALENDAR = mcal.get_calendar("NYSE")
 EASTERN = ZoneInfo("America/New_York")
 
 
+# Validate a forecast's 20-session horizon and map its price fields into a monitor watch.
 def forecast_fields(forecast, *, price_basis="raw"):
     """Map a native DE estimate; price_basis is caller-declared, not provider-qualified."""
     f = forecast
@@ -55,6 +56,7 @@ def forecast_fields(forecast, *, price_basis="raw"):
     )
 
 
+# Measure elapsed trading sessions between the reference close and the observation.
 def session_fields(reference_at, observed_at, *, symbol="DE"):
     """Use actual regular-session lengths; CLOSED means outside the regular session."""
     reference, observed = map(instant, (reference_at, observed_at))
@@ -77,6 +79,7 @@ def session_fields(reference_at, observed_at, *, symbol="DE"):
     )
 
 
+# Check whether a saved broker bar series provides the evidence required by the monitor.
 def qualify_history(raw, received_at, *, checked_at=None, request=None):
     """Describe saved minute bars without inventing the metadata needed for live use."""
     received = instant(received_at)
@@ -88,6 +91,7 @@ def qualify_history(raw, received_at, *, checked_at=None, request=None):
         history = {}
     checks = {}
 
+    # Record the result and explanation for one bar-history check.
     def check(name, passed, detail):
         checks[name] = dict(status="pass" if passed else "fail", detail=detail)
 
@@ -172,6 +176,7 @@ def qualify_history(raw, received_at, *, checked_at=None, request=None):
     )
 
 
+# Inspect a saved quote's prices, timestamps, and suitability for monitoring.
 def qualify_snapshot(raw, received_at, *, checked_at=None, request=None, symbol="DE"):
     """Inspect a saved snapshot; timestamp interpretation is not provider qualification."""
     received = instant(received_at)
@@ -203,6 +208,7 @@ def qualify_snapshot(raw, received_at, *, checked_at=None, request=None, symbol=
     check_age = (checked - observed).total_seconds() if observed else None
     checks = {}
 
+    # Record the result and explanation for one quote-snapshot check.
     def check(name, passed, detail):
         checks[name] = dict(status="pass" if passed else "fail", detail=detail)
 
@@ -266,6 +272,7 @@ def qualify_snapshot(raw, received_at, *, checked_at=None, request=None, symbol=
     )
 
 
+# Read the selected input and report its broker-data checks.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("response", type=Path, help="Saved MCP market-data response JSON.")

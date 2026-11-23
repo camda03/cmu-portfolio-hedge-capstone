@@ -53,14 +53,17 @@ class Decision(BaseModel):
     verification_question: str
 
 
+# Serialize a monitor record as consistently ordered, indented JSON.
 def dump(value):
     return json.dumps(value, ensure_ascii=True, sort_keys=True, indent=2, allow_nan=False)
 
 
+# Return the SHA-256 fingerprint of the supplied text or bytes.
 def digest(data):
     return hashlib.sha256(data.encode() if isinstance(data, str) else data).hexdigest()
 
 
+# Save a checkpoint atomically so readers see a complete record.
 def write(path, value):
     """Commit a checkpoint before any following external request."""
     directories = {path.parent}
@@ -83,14 +86,17 @@ def write(path, value):
             os.close(descriptor)
 
 
+# Load a monitor record from a JSON file.
 def read(path):
     return json.loads(path.read_text())
 
 
+# Return the current UTC time with its offset for the audit record.
 def stamp():
     return datetime.now(timezone.utc).isoformat()
 
 
+# Check whether the evidence covers the full requested monitoring window.
 def has_gap(packet):
     coverage = packet["coverage"]
     through = coverage.get("checked_through")
@@ -102,6 +108,7 @@ def has_gap(packet):
     )
 
 
+# Build the selected monitor's model request from its watchlist, evidence, and instructions.
 def request_for(watchlist, packet, prompt, arm):
     # Explicit fields prevent evaluator labels, split names and other arms leaking in.
     payload = {
@@ -135,6 +142,7 @@ def request_for(watchlist, packet, prompt, arm):
     )
 
 
+# Estimate an upper bound on the cost of the proposed model request.
 def reserve(request, arm):
     size = len(dump(request).encode())
     if size > MAX_REQUEST_BYTES:
@@ -146,6 +154,7 @@ def reserve(request, arm):
     ) / 1_000_000
 
 
+# Estimate the call's cost from its reported token usage and applicable rates.
 def token_cost(usage, arm, rates=None):
     """Rate-based estimate, not an invoice; reasoning is already inside output_tokens."""
     total, output = usage["input_tokens"], usage["output_tokens"]
@@ -166,6 +175,7 @@ def token_cost(usage, arm, rates=None):
     )
 
 
+# Check that the evaluation packets, watchlists, labels, and sources refer to matching cases.
 def validate_suite(watches, packets, labels, sources):
     ids = [p["id"] for p in packets]
     if not 1 <= len(packets) <= 12 or len(set(ids)) != len(ids) or set(ids) != set(labels):
@@ -222,6 +232,7 @@ def validate_suite(watches, packets, labels, sources):
             raise ValueError("Evaluator refers to missing evidence.")
 
 
+# Build the evaluation requests and total their estimated cost before dispatch.
 def make_plan(files):
     watches, packets, labels, sources = [
         json.loads(files["fixtures/monitor/" + n + ".json"])
@@ -251,6 +262,7 @@ def make_plan(files):
     return plan, total
 
 
+# Freeze the evaluation inputs and persist the plan for a repeatable monitor trial.
 def prepare(root=ROOT):
     files = {name: (root / name).read_bytes() for name in FILES}
     hashes = {name: digest(data) for name, data in files.items()}
@@ -283,6 +295,7 @@ def prepare(root=ROOT):
     return trial
 
 
+# Recheck the trial's saved inputs against its manifest before continuing.
 def verify(trial):
     manifest = read(trial / "manifest.json")
     if digest(dump(manifest["files"])) != manifest["fingerprint"]:
@@ -305,6 +318,7 @@ def verify(trial):
     return manifest
 
 
+# Validate a monitor decision against the watch conditions and evidence supplied for the case.
 def checked_decision(text, watchlist, packet):
     value = Decision.model_validate_json(text).model_dump()
     allowed = {c["id"] for c in watchlist["conditions"]} | {"UNLISTED"}
@@ -325,6 +339,7 @@ def checked_decision(text, watchlist, packet):
     return value
 
 
+# Map the monitor's decision and any coverage gap to a proposed follow-up action.
 def action_for(value, packet):
     decision = value["decision"]
     coverage = packet["coverage"]
@@ -343,12 +358,14 @@ def action_for(value, packet):
     )
 
 
+# Write a progress update for the running monitor trial.
 def progress(trial, message):
     print(message, flush=True)
     with (trial / "run.log").open("a") as stream:
         stream.write(f"{stamp()} {message}\n")
 
 
+# Run the planned monitor cases and checkpoint their responses for later scoring.
 def run_trial(trial, client):
     manifest = verify(trial)
     frozen = trial / "frozen"
@@ -437,6 +454,7 @@ def run_trial(trial, client):
             ) from None
 
 
+# Compare the saved trial decisions with their labels and summarize the results.
 def summarize(trial):
     manifest = verify(trial)
     packets = read(trial / "frozen/fixtures/monitor/packets.json")
@@ -673,6 +691,7 @@ def summarize(trial):
     return summary
 
 
+# Dispatch the command to prepare, run, or summarize a monitor trial.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", nargs="?", choices=("prepare", "run", "summary"), default="run")

@@ -3,6 +3,7 @@
 from copy import deepcopy
 
 
+# Label one coverage measure with its unit, source, and availability.
 def count(value, label, unit, source, note=""):
     if value is not None and (type(value) is not int or value < 0):
         raise ValueError("Invalid recorded count: " + label)
@@ -18,6 +19,7 @@ def count(value, label, unit, source, note=""):
     }
 
 
+# Assemble the study's observation dates, coverage counts, and evidence limits.
 def disclosure(packet, research_receipt=None):
     summary, receipt = packet["summary"], research_receipt or {}
     context = summary.get("context", {})

@@ -42,10 +42,12 @@ details{border-top:1px solid var(--line);margin-top:22px;padding-top:14px}summar
 """
 
 
+# Return the supplied mapping or an empty one when the saved field has another type.
 def as_dict(value):
     return value if isinstance(value, dict) else {}
 
 
+# Read a saved JSON object and return a displayable error when it is unavailable.
 def read_json(path):
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -56,6 +58,7 @@ def read_json(path):
         return {}, f"{path.name} unavailable or invalid ({type(error).__name__})."
 
 
+# Read optional report text for display, using an empty value when it cannot be read.
 def read_text(path):
     try:
         return path.read_text(encoding="utf-8")
@@ -63,6 +66,7 @@ def read_text(path):
         return ""
 
 
+# Format a recorded time in US Eastern time for the run summary.
 def stamp(value):
     try:
         date = (
@@ -76,6 +80,7 @@ def stamp(value):
         return "Not recorded"
 
 
+# Format a finite numeric field or display the missing-value label.
 def number(value, spec, prefix=""):
     return (
         prefix + format(value, spec)
@@ -84,6 +89,7 @@ def number(value, spec, prefix=""):
     )
 
 
+# Build the HTML review page from the files saved for a research run.
 def render_run(run):
     run = Path(run).resolve()
     if not run.is_dir():

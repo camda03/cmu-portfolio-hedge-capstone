@@ -1,8 +1,12 @@
+// Read a finite numeric metric while preserving missing values.
 const metricNumber = (value) => (value == null || value === "" || !Number.isFinite(Number(value)) ?
   null : Number(value));
+// Describe a signed futures position as long, short, or flat.
 const positionName = (n) => (n == null ? "Unavailable" : n === 0 ? "Flat" :
   `${Math.abs(n)} ${n < 0 ? "short" : "long"}`);
+// Show the direction and dollar size of a portfolio contribution.
 const signedMoney = (n, places = 2) => (n == null ? "—" : (n > 0 ? "+" : "") + money(n, places));
+// Calculate cumulative return relative to the opening portfolio value.
 const returnFrom = (value, start) => (start > 0 && value != null ? Number(value) / start - 1 : null);
 const booked = b.futures[t.contract]?.contracts ?? 0;
 const nav = metricNumber(b.portfolio_value_usd),
@@ -25,6 +29,7 @@ const proposed = t.candidates.find((row) => row.target_contracts === target);
 const scenarioNames = ["decline", "flat", "rally"].filter((name) => proposed?.scenarios?.[name]);
 let compareMode = "difference",
   performanceMode = "returns";
+// Format a calendar date without moving it across a timezone boundary.
 const calendarDay = (s) =>
   new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -34,10 +39,14 @@ const calendarDay = (s) =>
   }).format(
     new Date(s + "T12:00:00Z"),
   );
+// Create a link to another section of the portfolio desk.
 const linkPage = (key, text) => `<a class="textlink" href="#${key}">${esc(text)}</a>`;
+// Render one overview metric with its label, value, and context.
 const kpi = (label, value, hint, color = "") =>
   `<div class="kpi"><span>${esc(label)}</span><strong class="${color}">${esc(value)}</strong><small>${esc(hint)}</small></div>`;
+// Display portfolio beta to three decimal places when it is available.
 const formatBeta = (beta) => (beta == null ? "—" : num(beta, 3));
+// Build the buttons for switching between measures and mark the active choice.
 const segment = (name, options, selected) =>
   `<div class="seg" role="group" aria-label="${esc(name)}">` +
   options
@@ -46,6 +55,7 @@ const segment = (name, options, selected) =>
   .join("") +
   "</div>";
 
+// Show how the selected hedge performs under each market scenario.
 function stressPanel() {
   if (!proposed || !scenarioNames.length)
     return panel("<h2>Decision scenarios</h2><p>Scenario estimates are unavailable for this run.</p>");
@@ -73,6 +83,7 @@ function stressPanel() {
       .base ?? 0)])),
   );
 
+  // Scale a scenario bar and place losses and gains on opposite sides of zero.
   function bar(n, cls) {
     if (n == null) return "";
     const width = (Math.abs(n) / scale) * 48;
@@ -106,6 +117,7 @@ function stressPanel() {
   );
 }
 
+// Display the booked futures position, its mark, and its signed exposure.
 function exposureCard() {
   const bookedNotional = booked * unit,
     value = b.futures[t.contract]?.mark ?? d.market.quotes[t.contract]?.last;
@@ -126,8 +138,10 @@ function exposureCard() {
   );
 }
 
+// Compare the hedged and unhedged books over the same observations.
 function performancePanel() {
   const returns = performanceMode === "returns",
+    // Choose returns or dollar values for the selected portfolio series.
     chartValues = (k) => hist.map((pt) => (returns ? returnFrom(pt[k], startNav) : metricNumber(pt[k])));
   const labels = hist.map((pt) => shortTime(pt.as_of));
   const hedgeReturn = returnFrom(nav, startNav),
@@ -159,6 +173,7 @@ function performancePanel() {
   );
 }
 
+// Summarize the analyst and news evidence that informed the decision.
 function intelligenceCard() {
   const F = a.map((s) => s.forecast);
   const estimates = F.filter((f) => f.status === "estimate").length;
@@ -175,6 +190,7 @@ function intelligenceCard() {
   );
 }
 
+// Bring portfolio values, the hedge, scenarios, and supporting research onto one page.
 function overviewPage() {
   const asof = d.session_date || d.market.session_date || d.batch_date;
   const betaChange =

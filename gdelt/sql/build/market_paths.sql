@@ -11,7 +11,7 @@ CREATE OR REPLACE TABLE `${dataset}.market_paths` CLUSTER BY observed_day AS WIT
      q.observed_day AS observed_day,
      MIN(s.session_index) AS anchor_index
    FROM `${dataset}.daily_quotas` AS q
-   JOIN sessions AS s ON s.session_date>q.observed_day
+   JOIN sessions AS s ON s.session_date>q.observed_day  -- Start at the first close after the news date.
    GROUP BY q.observed_day),
   paths AS
   (SELECT

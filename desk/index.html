@@ -1346,6 +1346,7 @@ let stock = a.find((s) => s.symbol === "AAPL").symbol,
   inspectSymbol = "AAPL",
   packetError = "";
 // In displayed research, address assignments to the portfolio manager. Keep the signed report intact.
+// Replace the named report contact in text shown on the portfolio desk.
 function reportText(value) {
   const name = d.report_contact;
   if (!name || !/^[a-z]+$/i.test(name)) return value;
@@ -1354,6 +1355,7 @@ function reportText(value) {
       "$1 the portfolio manager")
     .replace(new RegExp("\\b" + name + "(?=[’']s\\b|\\*{0,2}\\s*[:,;/])", "g"), "Portfolio manager");
 }
+// Prepare text for safe insertion into the desk's HTML.
 const esc = (x) =>
   String(x ?? "—")
   .replaceAll("Dated regular-hours close used for this rehearsal.",
@@ -1374,11 +1376,13 @@ const esc = (x) =>
       "'": "&#39;"
     })[c],
   );
+// Format a number with the requested decimal places for the desk.
 const num = (n, k = 0) =>
   Number(n).toLocaleString("en-US", {
     maximumFractionDigits: k,
     minimumFractionDigits: k
   });
+// Format a dollar amount and provide a placeholder when the value is missing.
 const money = (n, k = 0) =>
   n == null ?
   "—" :
@@ -1388,8 +1392,11 @@ const money = (n, k = 0) =>
     maximumFractionDigits: k,
     minimumFractionDigits: k,
   });
+// Display a decimal return as a signed percentage.
 const pct = (n) => (n == null ? "—" : (n > 0 ? "+" : "") + num(100 * n, 2) + "%");
+// Add an explicit plus sign to positive position changes.
 const signed = (n) => (n > 0 ? "+" + n : String(n));
+// Format a timestamp for the US Eastern market timezone.
 const et = (s) =>
   s == null ?
   "—" :
@@ -1402,6 +1409,7 @@ const et = (s) =>
     minute: "2-digit",
     timeZoneName: "short",
   }).format(new Date(s));
+// Format an Eastern timestamp compactly for a chart or table.
 const shortTime = (s) =>
   new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
@@ -1410,8 +1418,11 @@ const shortTime = (s) =>
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(s));
+// Wrap related desk content in a styled panel.
 const panel = (s, cls = "") => '<section class="panel ' + cls + '">' + s + "</section>";
+// Render the page heading and its introductory sentence.
 const title = (h, p) => "<h1>" + esc(h) + '</h1><p class="intro">' + esc(p) + "</p>";
+// Render one metric with its label, value, and explanatory text.
 const stat = (k, n, h) =>
   '<div class="stat"><label>' +
   esc(k) +
@@ -1420,13 +1431,16 @@ const stat = (k, n, h) =>
   "</strong><span>" +
   esc(h) +
   "</span></div>";
+// Place a group of related metrics together.
 const stats = (...rows) => '<div class="stats">' + rows.map((r) => stat(...r)).join("") + "</div>";
+// Build a scrollable table from column headings and prepared rows.
 const table = (heads, rows) =>
   '<div class="scroll"><table><thead><tr>' +
   heads.map((s) => "<th>" + esc(s) + "</th>").join("") +
   "</tr></thead><tbody>" +
   rows.map((row) => "<tr>" + row.map((c) => "<td>" + esc(c) + "</td>").join("") + "</tr>").join("") +
   "</tbody></table></div>";
+// Build a link to a source after checking that its URL uses HTTP or HTTPS.
 const external = (url, label) => {
   try {
     if (!url) return "";
@@ -1443,8 +1457,10 @@ const external = (url, label) => {
     return "";
   }
 };
+// Wrap optional evidence in an expandable section.
 const details = (name, content) =>
   "<details><summary>" + esc(name) + "</summary>" + content + "</details>";
+// Display a labeled passage from the decision memo.
 const memo = (name, text) =>
   '<div class="memo"><h3>' + esc(name) + '</h3><p class="measure">' + esc(text) + "</p></div>";
 const keep = m.current_contracts,
@@ -1452,6 +1468,7 @@ const keep = m.current_contracts,
   delta = m.change_contracts,
   hist = d.tracker.points;
 
+// Plot the supplied time series on shared axes with formatted value labels.
 function chart(lines, labels, formatter, ylabel, times = null) {
   const W = 700,
     H = 230,
@@ -1477,8 +1494,10 @@ function chart(lines, labels, formatter, ylabel, times = null) {
     hi += p;
   }
   const elapsed = times && times.at(-1) - times[0],
+    // Position a chart point by elapsed time or, when timestamps are unavailable, by index.
     X = (i) => L + (W - L - R) * (elapsed > 0 ? (times[i] - times[0]) / elapsed : i / Math.max(1, labels
       .length - 1)),
+    // Convert a plotted value to an SVG height, with larger values nearer the top.
     Y = (n) => T + ((hi - n) * (H - T - B)) / (hi - lo);
   let svg =
     '<svg viewBox="0 0 700 230" role="img" aria-label="' +
@@ -1541,6 +1560,7 @@ function chart(lines, labels, formatter, ylabel, times = null) {
   return '<div class="figure">' + svg + "</svg></div>";
 }
 
+// Show how research, prices, and the ledger contribute to a hedge decision.
 function mapPage() {
   return (
     title(
@@ -1589,6 +1609,7 @@ function mapPage() {
   );
 }
 
+// Display the selected subject's forecast, evidence, and analyst report.
 function analystPage(batch) {
   const a = batch.analysts;
   let s = a.find((x) => x.symbol === stock),
@@ -1685,6 +1706,7 @@ function analystPage(batch) {
   );
 }
 
+// Display the verification result for the selected research packet.
 function showReceipt() {
   let el = document.querySelector("#receiptResult");
   if (!el || !receiptData) return;
@@ -1729,9 +1751,11 @@ function showReceipt() {
       "") +
     "</div>";
 }
+// Compare a local packet with its receipt and verify the individual reports.
 async function inspectPacket(file, r) {
   if (!window.crypto?.subtle)
     throw Error("Open this HTML locally in a browser that supports SHA-256 verification.");
+  // Convert the browser's SHA-256 digest to the hexadecimal form used by the receipt.
   const hash = async (b) =>
     Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", b)), (v) =>
       v.toString(16).padStart(2, "0"),
@@ -1775,8 +1799,10 @@ async function inspectPacket(file, r) {
   return p;
 }
 
+// Show the news analogs and market paths from the selected GDELT study.
 function gdeltPage(study) {
   const decisionStudy = study === g;
+  // Build a study-selection link and identify the currently selected view.
   const choice = (key, text, selected) =>
     '<a href="#' + key + '"' + (selected ? ' aria-current="page"' : '') + '>' + esc(text) + '</a>';
   const choices = '<div class="study-choices" role="group" aria-label="GDELT study">' +
@@ -1918,6 +1944,7 @@ function gdeltPage(study) {
   );
 }
 
+// Display the decision, its rationale, and the alternatives considered.
 function hedgePage() {
   return (
     title("Hedge decision", m.rationale) +
@@ -2052,6 +2079,7 @@ function hedgePage() {
   );
 }
 
+// Show the paper holdings, futures position, cash, and unhedged comparison.
 function bookPage() {
   return (
     title(
@@ -2125,11 +2153,15 @@ function bookPage() {
     )
   );
 }
+// Read a finite numeric metric while preserving missing values.
 const metricNumber = value => value == null || value === "" || !Number.isFinite(Number(value)) ? null :
   Number(value);
+// Describe a signed futures position as long, short, or flat.
 const positionName = n => n == null ? "Unavailable" : n === 0 ? "Flat" :
   `${Math.abs(n)} ${n < 0 ? "short" : "long"}`;
+// Show the direction and dollar size of a portfolio contribution.
 const signedMoney = (n, places = 2) => n == null ? "—" : (n > 0 ? "+" : "") + money(n, places);
+// Calculate cumulative return relative to the opening portfolio value.
 const returnFrom = (value, start) => start > 0 && value != null ? Number(value) / start - 1 : null;
 const booked = b.futures[t.contract]?.contracts ?? 0;
 const nav = metricNumber(b.portfolio_value_usd),
@@ -2149,6 +2181,7 @@ const proposed = t.candidates.find(row => row.target_contracts === target);
 const scenarioNames = ["decline", "flat", "rally"].filter(name => proposed?.scenarios?.[name]);
 let compareMode = "difference",
   performanceMode = "returns";
+// Format a calendar date without moving it across a timezone boundary.
 const calendarDay = s => new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -2156,15 +2189,20 @@ const calendarDay = s => new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC"
   })
   .format(new Date(s + "T12:00:00Z"));
+// Create a link to another section of the portfolio desk.
 const linkPage = (key, text) => `<a class="textlink" href="#${key}">${esc(text)}</a>`;
+// Render one overview metric with its label, value, and context.
 const kpi = (label, value, hint, color = "") =>
   `<div class="kpi"><span>${esc(label)}</span><strong class="${color}">${esc(value)}</strong><small>${esc(hint)}</small></div>`;
+// Display portfolio beta to three decimal places when it is available.
 const formatBeta = beta => beta == null ? "—" : num(beta, 3);
+// Build the buttons for switching between measures and mark the active choice.
 const segment = (name, options, selected) => `<div class="seg" role="group" aria-label="${esc(name)}">` +
   options.map(([key, label]) =>
     `<button data-switch="${key}" aria-pressed="${key === selected}">${esc(label)}</button>`).join("") +
   "</div>";
 
+// Show how the selected hedge performs under each market scenario.
 function stressPanel() {
   if (!proposed || !scenarioNames.length) return panel(
     "<h2>Decision scenarios</h2><p>Scenario estimates are unavailable for this run.</p>");
@@ -2189,6 +2227,7 @@ function stressPanel() {
   const scale = Math.max(1, ...rows.flatMap(r => relative ? [Math.abs(r.overlay ?? 0)] : [Math.abs(r
     .total ?? 0), Math.abs(r.base ?? 0)]));
 
+  // Scale a scenario bar and place losses and gains on opposite sides of zero.
   function bar(n, cls) {
     if (n == null) return "";
     const width = Math.abs(n) / scale * 48;
@@ -2211,6 +2250,7 @@ function stressPanel() {
       ));
 }
 
+// Display the booked futures position, its mark, and its signed exposure.
 function exposureCard() {
   const bookedNotional = booked * unit,
     value = b.futures[t.contract]?.mark ?? d.market.quotes[t.contract]?.last;
@@ -2227,8 +2267,10 @@ function exposureCard() {
     `<div class="pos-foot"><span>${esc(targetNote || (m.action === "defer" ? "Decision deferred" : "Recorded position"))}</span>${linkPage("hedge","View decision")}</div></section>`;
 }
 
+// Compare the hedged and unhedged books over the same observations.
 function performancePanel() {
   const returns = performanceMode === "returns",
+    // Choose returns or dollar values for the selected portfolio series.
     chartValues = k => hist.map(pt => returns ? returnFrom(pt[k], startNav) : metricNumber(pt[k]));
   const labels = hist.map(pt => shortTime(pt.as_of));
   const hedgeReturn = returnFrom(nav, startNav),
@@ -2249,6 +2291,7 @@ function performancePanel() {
     );
 }
 
+// Summarize the analyst and news evidence that informed the decision.
 function intelligenceCard() {
   const F = a.map(s => s.forecast);
   const estimates = F.filter(f => f.status === "estimate").length;
@@ -2260,6 +2303,7 @@ function intelligenceCard() {
     `<p class="source-date">${g?"Cohort "+esc(et(g.window.start)):esc(d.gdelt_gap)}</p></section>`;
 }
 
+// Bring portfolio values, the hedge, scenarios, and supporting research onto one page.
 function overviewPage() {
   const asof = d.session_date || d.market.session_date || d.batch_date;
   const betaChange = bookedBeta == null ? "Estimate unavailable" : "Change " + (bookedBeta - equityBeta >
@@ -2281,9 +2325,11 @@ const quality = d.freshness?.rows || [];
 const warnings = quality.filter(row => !["Current", "Replay close", "Reference", "Dated"].includes(row
   .status));
 const journal = d.history || [];
+// Choose a calendar-date or timestamp format to match the source.
 const prettyDate = value => !value ? "—" : /^\d{4}-\d{2}-\d{2}$/.test(value) ? calendarDay(value) : et(
   value);
 
+// Determine whether the saved market observations need an age warning.
 function archiveWarning() {
   const now = Date.now(),
     f = d.freshness;
@@ -2295,6 +2341,7 @@ function archiveWarning() {
   return "";
 }
 
+// Summarize source-date issues and link to the detailed evidence dates.
 function freshnessBanner() {
   if (!quality.length) return '<div class="warning-strip">Source dates unavailable. ' + linkPage(
     "freshness", "Inspect inputs") + '</div>';
@@ -2308,6 +2355,7 @@ function freshnessBanner() {
       "freshness", "See source dates") + '</div>';
 }
 
+// Group decision inputs by source and display their recorded dates and status.
 function freshnessPage() {
   const grouped = [...new Set(quality.map(row => row.group))];
   return title("Source dates & freshness",
@@ -2324,6 +2372,7 @@ function freshnessPage() {
     (quality.length ? "" : panel('<p class="empty">The saved run has no dated evidence ledger.</p>'));
 }
 
+// Summarize past hedge decisions and the outcomes available for comparison.
 function journalPage() {
   const scored = journal.filter(row => row.outcome);
   const helped = scored.filter(row => row.outcome.result === "Helped").length,
@@ -2382,14 +2431,19 @@ const pages = {
   journal: journalPage,
   freshness: freshnessPage,
   map: mapPage,
+  // Open the latest analyst packet published for the desk.
   analysts: () => analystPage(latestAnalysts),
+  // Open the analyst packet used for this particular hedge decision.
   "analysts-decision": () => analystPage(d),
+  // Open the latest GDELT study available on the desk.
   gdelt: () => gdeltPage(latestStudy),
+  // Open the GDELT study used for this particular hedge decision.
   "gdelt-decision": () => gdeltPage(g),
   hedge: hedgePage,
   portfolio: bookPage,
 };
 
+// Render the selected desk section and keep its navigation state in sync.
 function show(key, scroll) {
   if (!Object.hasOwn(pages, key)) key = "overview";
   const navKey = key === "gdelt-decision" ? "gdelt" : key === "analysts-decision" ? "analysts" : key;
@@ -2412,6 +2466,7 @@ const sessionsLink = document.querySelector("#worker-files");
 if (sample || control || !d.links?.workerSessions) sessionsLink.remove();
 else sessionsLink.href = d.links.workerSessions;
 document.querySelector("#largeMap").src = mapSrc;
+// Handle desk buttons for navigation, display choices, and evidence inspection.
 document.addEventListener("click", (e) => {
   const el = e.target.closest("button");
   if (!el) return;
@@ -2435,6 +2490,7 @@ document.addEventListener("click", (e) => {
   }
   if (el.id === "expand") document.querySelector("#mapdialog").showModal();
 });
+// Refresh the selected evidence or verify the packet chosen in the file picker.
 document.addEventListener("change", async (e) => {
   let el = e.target;
   if (el.id === "datepick" || el.id === "group") {
@@ -2486,6 +2542,7 @@ document.addEventListener("change", async (e) => {
     showReceipt();
   }
 });
+// Display the section named in the browser's updated URL fragment.
 window.addEventListener("hashchange", () => show(location.hash.slice(1), true));
 show(location.hash.slice(1) || "overview", false);
 </script>

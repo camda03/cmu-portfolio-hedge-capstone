@@ -31,6 +31,7 @@ from ledger import EASTERN, entries, instant, number, open_book, record, stateme
 from paired_research import archived_analysts, gdelt_input
 
 
+# Load the dated or archived analyst packet and identify the evidence used for this decision.
 def research(args, now):
     if args.archive is None:
         require(args.batch, "Supply the session date printed on the daily producer receipt.")
@@ -76,6 +77,7 @@ def research(args, now):
     )
 
 
+# Build a deterministic review response for a test with a specified hedge target.
 def control_response(inputs, target):
     current = inputs["alternatives"]["current_contracts"]
     memo = dict.fromkeys(
@@ -98,6 +100,7 @@ def control_response(inputs, target):
     )
 
 
+# Record the reviewed target and its paper fill or deferral in the portfolio ledger.
 def paper_decision(db, seed, inputs, decision):
     at, market = inputs["as_of"], inputs["market"]
     event = dict(
@@ -135,6 +138,7 @@ def paper_decision(db, seed, inputs, decision):
     return result
 
 
+# Assemble a closing-price decision, update its paper ledger, and publish the review files.
 def run(args):
     now = datetime.now(timezone.utc)
     receipt, feed, analyst_basis = research(args, now)
@@ -194,7 +198,7 @@ def run(args):
                     source.execute("SELECT 1 FROM journal WHERE id='opening'").fetchone(),
                     "Expected an existing paper book.",
                 )
-                source.backup(db)
+                source.backup(db)  # Carry the previously booked position into this review.
         seed = open_book(db)
         prior = entries(db, datetime.max.replace(tzinfo=timezone.utc).isoformat())
         before = statement(seed, prior)
@@ -327,6 +331,7 @@ def run(args):
             return folder
 
 
+# Read the closing-run options and select the research source and review mode.
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     source = p.add_mutually_exclusive_group()

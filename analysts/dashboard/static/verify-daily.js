@@ -1,3 +1,4 @@
+// Fetch a published record from this site and surface any HTTP error.
 async function readPublication(path) {
   const response = await fetch(path, {
     mode: "same-origin",
@@ -8,6 +9,7 @@ async function readPublication(path) {
   return response;
 }
 
+// Check the daily receipt, packet checksum, and seven subjects before displaying the result.
 async function verify() {
   const date = new URLSearchParams(location.search).get("date");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Specify the session with ?date=YYYY-MM-DD.");
@@ -21,7 +23,7 @@ async function verify() {
   }
   const packetPath = `/api/portfolio-research/test/${receipt.run_id}`;
   const bytes = await (await readPublication(packetPath)).arrayBuffer();
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);  // Compare the exact downloaded bytes.
   const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
   if (hash !== receipt.packet_sha256) throw new Error(
     "The downloaded packet differs from the receipt checksum.");

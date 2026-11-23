@@ -13,7 +13,7 @@ WITH combined AS (
     b.bm25_score_exact AS bm25_score_exact,
     b.bm25_score AS bm25_score,
     b.bm25_rank AS bm25_rank,
-    IF(c.cosine_rank IS NULL, 0.0, 1.0 / (60.0 + c.cosine_rank))
+    IF(c.cosine_rank IS NULL, 0.0, 1.0 / (60.0 + c.cosine_rank))  -- A missing rank contributes zero.
       + IF(b.bm25_rank IS NULL, 0.0, 1.0 / (60.0 + b.bm25_rank)) AS rrf_score
   FROM `${dataset}.full2m_eval_ivf40_matches_v01` AS c
   FULL OUTER JOIN `${dataset}.full2m_eval_bm25_matches_v01` AS b

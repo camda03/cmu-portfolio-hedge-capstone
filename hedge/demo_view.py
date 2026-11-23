@@ -13,9 +13,11 @@ from source_dates import source_dates
 from hedge_session import ROOT, read_json, require, save
 
 
+# Assemble portfolio values and past decisions for the desk's performance display.
 def tracker(seed, events):
     points = []
 
+    # Select the dated values needed for one point on the portfolio chart.
     def point(book):
         return {
             k: book[k]
@@ -42,9 +44,11 @@ def tracker(seed, events):
     return dict(current=book, points=points, decisions=decisions[-40:])
 
 
+# Prepare the study link, evidence, and observation dates for the hedge desk.
 def gdelt_view(folder, handoff):
     from hashlib import sha256
 
+    # Verify the published checksum before reading a GDELT evidence file.
     def evidence(name):
         raw = (Path(folder) / name).read_bytes()
         require(
@@ -116,6 +120,7 @@ def gdelt_view(folder, handoff):
     )
 
 
+# Collect the saved decision artifacts and write the portfolio desk page.
 def render(folder, gdelt_dir=None):
     payload = read_json(folder / "request.json")
     if gdelt_dir is not None:
@@ -171,6 +176,7 @@ def render(folder, gdelt_dir=None):
     (folder / "index.html").write_text(render_page(view))
 
 
+# Fill the desk template with its scripts, styles, and serialized decision data.
 def render_page(view):
     assets = ROOT / "demo_assets"
     raw = json.dumps(view, ensure_ascii=True, allow_nan=False, separators=(",", ":")).replace(

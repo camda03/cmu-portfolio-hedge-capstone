@@ -16,6 +16,7 @@ from dashboard.app import Store
 from worker.pilot import validate_plan, metric_body
 
 
+# Summarize the pilot's hourly coverage and flag conditions that require attention.
 def observe(folder, now):
     plan = validate_plan(read(folder / "pilot.json"))
     current, start, end = map(instant, (now, plan["starts_at"], plan["ends_at"]))
@@ -80,6 +81,7 @@ def observe(folder, now):
     )
 
 
+# Record the pilot's health and send its observation to Cloud Monitoring.
 def check(folder, store, project, now=None, session=None):
     now = now or stamp()
     try:

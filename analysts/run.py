@@ -28,6 +28,7 @@ from monitor_live import SOL_MODEL, ASTRA_MODEL, MODEL_PROFILE, matches_model, r
 from securities import SECURITIES, SUBJECTS, CONTRACTS as IBKR_CONTRACTS
 
 
+# Reuse a saved analyst stage only when its model, search, and completion records match.
 def saved_analyst(folder, name, model):
     """Only a complete, searched, matching saved stage can replace a new call."""
     message = AIMessage.model_validate_json((folder / (name + ".json")).read_text())
@@ -50,6 +51,7 @@ def saved_analyst(folder, name, model):
     return message
 
 
+# Retry temporary rate limits within the stage deadline and retain the attempt receipts.
 def invoke_paced(call, folder, name, timeout):
     """Retry explicit temporary 429s only; retain request receipts and one total deadline."""
     deadline = monotonic() + timeout
@@ -123,6 +125,7 @@ def invoke_paced(call, folder, name, timeout):
             return message
 
 
+# Format the model's prose and citations while preserving the structured forecast.
 def readable(message):
     """Render prose citations without changing the fenced forecast JSON."""
     parts = []
@@ -151,6 +154,7 @@ def readable(message):
     return "\n\n".join(parts).strip()
 
 
+# Validate and summarize supplemental broker market data for a single subject.
 def ibkr_market_context(source, symbol, cutoff, folder):
     """Admit a bounded public snapshot record; provenance labels are not authentication."""
     gap = "\n\nSupplementary IBKR trading/positioning data was not supplied for this subject. Raise expected missing metrics for the portfolio manager; do not substitute web/vendor values.\n"
@@ -200,6 +204,7 @@ def ibkr_market_context(source, symbol, cutoff, folder):
     )
 
 
+# Validate the broker reference price and its session before analysts use it.
 def check_reference(snapshot, symbol, now, session):
     """Validate one broker observation before any model work."""
     price_date = session.name.date().isoformat()
@@ -290,6 +295,7 @@ def check_reference(snapshot, symbol, now, session):
     return reference
 
 
+# Recover the original dated reference close from saved research inputs or publications.
 def saved_daily_close(root, symbol, clock, session):
     """Find the original closing bar on the VM or in a completed daily publication."""
     from dashboard.app import Store
@@ -355,6 +361,7 @@ def saved_daily_close(root, symbol, clock, session):
     return None
 
 
+# Obtain the designated reference price or the requested series of broker closes.
 def collect_prices(
     symbols, period="ONE_WEEK", corporate_actions=False, *, cache_dir=None, now=None
 ):
@@ -518,6 +525,7 @@ def collect_prices(
     return target
 
 
+# Extract the forecast object from the report and parse its JSON.
 def forecast_json(report):
     """Admit valid JSON or one wrong closing bracket; never edit values or invent fields."""
     blocks = re.findall(r"```json\s*(.*?)```", report, re.S)
@@ -563,6 +571,7 @@ def forecast_json(report):
         )
 
 
+# Check the forecast against its evidence and publish the accepted report locally.
 def finalize_report(
     run,
     report,
@@ -732,6 +741,7 @@ def finalize_report(
     print(f"HTML: {render_run(run)}")
 
 
+# Coordinate the specialist research, draft, review, and publication for one subject.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("symbol", nargs="?", choices=SUBJECTS, default="MSFT")
@@ -968,6 +978,7 @@ def main():
         frozen = Path(context_file).read_text()
 
         # Only the execution timestamp may differ; keep the original case byte for byte.
+        # Remove the run-start timestamp before comparing otherwise identical stage instructions.
         def without_start_time(text):
             return re.sub(r"^Run started UTC: \S+\. ", "", text, count=1, flags=re.M)
 
@@ -1140,6 +1151,7 @@ def main():
             json.dumps(dict(source=str(reuse.resolve()), stages=list(reused)), indent=2)
         )
 
+    # Obtain one analyst's searched response, reusing a complete saved stage when available.
     def ask(name, material):
         model = models[name]
         started = monotonic()
@@ -1158,6 +1170,7 @@ def main():
         if discovery:
             system += "\n\n" + GUIDANCE
 
+        # Send the stage instructions and evidence through the configured model with web search.
         def request(remaining):
             client = ChatOpenAI(
                 model=model,

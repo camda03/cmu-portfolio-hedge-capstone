@@ -6,12 +6,15 @@ import json
 from ledger import instant
 
 
+# Stop the handoff when a timing, integrity, or evidence requirement is unmet.
 def require(condition, message):
     if not condition:
         raise ValueError(message)
 
 
+# Verify the GDELT delivery, its dates, and the hashes of its evidence files.
 def gdelt_input(folder, cutoff, allow_fixture):
+    # Read a named JSON record from the supplied GDELT delivery directory.
     def read(name):
         return json.loads((folder / name).read_bytes())
 
@@ -23,7 +26,7 @@ def gdelt_input(folder, cutoff, allow_fixture):
     )
     receipt_bytes = (folder / "receipt.json").read_bytes()
     receipt = json.loads(receipt_bytes)
-    digest = sha256(receipt_bytes).hexdigest()
+    digest = sha256(receipt_bytes).hexdigest()  # Hash the published bytes before decoding the JSON.
     run = handoff["run_id"]
     manifest = receipt["files"]
     require(
@@ -105,6 +108,7 @@ def gdelt_input(folder, cutoff, allow_fixture):
     return handoff, sha256(delivery_bytes).hexdigest(), fixture
 
 
+# Verify the seven archived analyst reports against the decision cutoff.
 def archived_analysts(analyst_file, cutoff):
     raw = analyst_file.read_bytes()
     feed = json.loads(raw)
@@ -144,6 +148,7 @@ def archived_analysts(analyst_file, cutoff):
     return feed, sha256(raw).hexdigest()
 
 
+# Combine verified analyst and GDELT evidence for the portfolio under review.
 def paired_research(folder, analyst_file, book, cutoff, allow_fixture=False):
     handoff, delivery_hash, fixture = gdelt_input(folder, cutoff, allow_fixture)
     feed, analyst_hash = archived_analysts(analyst_file, cutoff)

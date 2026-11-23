@@ -15,6 +15,7 @@ STANDARD = {
 WEB_SEARCH_USD = 0.01
 
 
+# Select the model's token prices for the size of the request.
 def rates(model, count):
     family = next(
         (name for name in STANDARD if model == name or (model or "").startswith(name + "-")), None
@@ -27,10 +28,12 @@ def rates(model, count):
     )
 
 
+# Read a saved usage record, returning an empty record when the file is absent.
 def read_json(path):
     return json.loads(path.read_text()) if path.is_file() else {}
 
 
+# Break one model receipt into token counts, tool usage, and estimated cost.
 def call_metrics(receipt):
     usage = receipt.get("usage") or {}
     inputs = usage.get("input_tokens_details") or {}
@@ -39,7 +42,7 @@ def call_metrics(receipt):
     search = ((receipt.get("tool_usage") or {}).get("web_search") or {}).get("num_requests")
     if included is False and search is None:
         search = 0
-    token_usd = None
+    token_usd = None  # An unpriced call must not count as free.
     if (
         receipt.get("service_tier") in ("default", None)
         and receipt.get("returned_model")
@@ -95,6 +98,7 @@ def call_metrics(receipt):
     )
 
 
+# Combine individual call measurements into a usage and cost summary.
 def totals(receipts):
     rows = [call_metrics(r) for r in receipts]
     # A missing reading is unknown. A terminal failure can still have metered usage.
@@ -122,6 +126,7 @@ def totals(receipts):
     )
 
 
+# Detect repeated response IDs before their usage can be counted twice.
 def check_ids(calls):
     ids = [r["response_id"] for r in calls.values() if r.get("response_id")]
     if len(ids) != len(set(ids)):
@@ -130,6 +135,7 @@ def check_ids(calls):
         )
 
 
+# Collect call receipts for one monitoring cycle or analyst run, including discovery.
 def task(folder):
     """Read dispatched calls for one hourly cycle or one analyst run, including both discovery sweeps."""
     calls = {}

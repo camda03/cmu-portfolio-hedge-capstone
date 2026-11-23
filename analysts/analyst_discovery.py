@@ -56,6 +56,7 @@ historical leads requiring independent support, not confirmed trigger evidence.
 """
 
 
+# Build the symbol's news searches and carry existing checks forward as watch conditions change.
 def checks_for(symbol, handoff=None, previous=None):
     """One discovery plan for baseline closure and subsequent monitoring."""
     if previous:
@@ -67,7 +68,7 @@ def checks_for(symbol, handoff=None, previous=None):
                     c["id"]
                     for c in handoff["conditions"]
                     if c["id"] in ids
-                    and ({c["id"]} | set(c["aliases"])) & set(old["condition_ids"])
+                    and ({c["id"]} | set(c["aliases"])) & set(old["condition_ids"])  # Aliases keep renamed conditions linked.
                 ],
             )
             for old in previous
@@ -110,6 +111,7 @@ def checks_for(symbol, handoff=None, previous=None):
     ]
 
 
+# Assemble the discovery request using the research cutoff and the current monitoring watch.
 def request_for(symbol, cutoff, cycle, context, watch=None, trigger=None, proposed=None):
     bound_monitor = trigger and trigger.get("schema") in ("monitor-return-v1", "monitor-return-v2")
     if bound_monitor:
@@ -218,6 +220,7 @@ def request_for(symbol, cutoff, cycle, context, watch=None, trigger=None, propos
     return request, payload
 
 
+# Check the model response, reported findings, and search coverage before accepting the sweep.
 def validate(raw, text, watch, state, payload, model):
     if (
         raw.get("status") != "completed"
@@ -272,6 +275,7 @@ def validate(raw, text, watch, state, payload, model):
     return value, {"execute": False}, {"coverage": coverage}, calls
 
 
+# Run or resume one discovery sweep and save the evidence for the analysts.
 def collect(
     folder,
     symbol,
@@ -330,6 +334,7 @@ def collect(
         write(folder / "watch.json", session)
     write(folder / "manifest.json", {"model": delta.MODEL})
 
+    # Write the local summary of the completed discovery sweep.
     def render(target, result):
         write(
             target / "summary.html",
@@ -383,6 +388,7 @@ def collect(
     return packet
 
 
+# Add reviewed findings and their dispositions to the forecast handoff.
 def attach(forecast, packet, previous=None):
     """Require review of every finding before publishing an analyst baseline."""
     items = forecast.get("discovery_dispositions")
@@ -438,6 +444,7 @@ def attach(forecast, packet, previous=None):
     forecast["shared_discovery"] = packet
 
 
+# Carry previously considered evidence into the next watch so genuine updates can be recognized.
 def carry_forward(watch, state, forecast):
     """Remember considered evidence versions without suppressing future changes."""
     packet = forecast.get("shared_discovery")
@@ -479,6 +486,7 @@ def carry_forward(watch, state, forecast):
     )
 
 
+# Combine the opening and closing searches into one record for the final analyst.
 def closing_packet(initial, closing):
     """Keep both sweeps and every finding; analysts must disposition all of them."""
     if (
@@ -513,6 +521,7 @@ def closing_packet(initial, closing):
     return packet
 
 
+# Load the saved searches and check that the closing sweep belongs to the same assessment.
 def saved_packet(output):
     """Check both saved sweeps before accepting a report that claims closing coverage."""
     from monitor import read

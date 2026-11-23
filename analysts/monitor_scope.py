@@ -70,6 +70,7 @@ class Batch(BaseModel):
     decisions: list[Decision]
 
 
+# Load the watch, evidence cases, and expected outcomes for the scope evaluation.
 def inputs(root):
     return tuple(
         read(root / "fixtures/monitor-scope" / (name + ".json"))
@@ -77,6 +78,7 @@ def inputs(root):
     )
 
 
+# Check that the scope cases and labels cover the expected watch conditions.
 def validate_inputs(watch, cases, labels):
     ids = [c["id"] for c in cases]
     conditions = [c["id"] for c in watch["conditions"]]
@@ -123,6 +125,7 @@ def validate_inputs(watch, cases, labels):
             raise ValueError("Evaluator label refers to an unsupported outcome or ID.")
 
 
+# Build the selected model's scope-evaluation request from the saved cases.
 def request_for(root, model):
     if model not in MODELS:
         raise ValueError("Unknown model profile.")
@@ -146,6 +149,7 @@ def request_for(root, model):
     )
 
 
+# Validate one scope decision against the watch and the case evidence.
 def check_decision(value, watch, case):
     value = Decision.model_validate(value).model_dump()
     if value["case_id"] != case["id"] or not value["reason"].strip():
@@ -166,6 +170,7 @@ def check_decision(value, watch, case):
     return value
 
 
+# Combine the news assessment with an independent evaluation of the price observation.
 def arbitrate(watch, observation, news=None, state=None):
     """Test adapter: news failure cannot prevent independent qualified price evaluation."""
     mapped, health = None, dict(status="unavailable", gaps=["No accepted news assessment."])
@@ -197,6 +202,7 @@ def arbitrate(watch, observation, news=None, state=None):
     )
 
 
+# Score the model's reported decisions against the expected case outcomes.
 def evaluate_response(text, root):
     watch, cases, labels = inputs(root)
     values = Batch.model_validate_json(text).model_dump()["decisions"]
@@ -230,6 +236,7 @@ def evaluate_response(text, root):
     return rows
 
 
+# Write an HTML summary of the scope evaluation and its individual cases.
 def render(folder, result):
     body = "<h1>Monitor scope test</h1><p>Controlled synthetic evidence; no executed referrals.</p>"
     body += "<p>Status: <b>" + escape(result["status"]) + "</b></p>"
@@ -261,6 +268,7 @@ def render(folder, result):
     )
 
 
+# Freeze the model request and supporting files for a scope evaluation.
 def prepare(folder, model, root=ROOT):
     request = request_for(root, model)
     hashes = {name: digest((root / name).read_bytes()) for name in FILES}
@@ -319,6 +327,7 @@ def prepare(folder, model, root=ROOT):
     )
 
 
+# Check the evaluation manifest and recover the exact request that was prepared.
 def verify(folder):
     manifest = read(folder / "manifest.json")
     identity = {k: manifest[k] for k in ("files", "model", "request_sha256")}
@@ -343,6 +352,7 @@ def verify(folder):
     return manifest, request
 
 
+# Run or reuse the scope evaluation and persist its scored result.
 def run(folder, client=None, *, verifier=verify, evaluator=evaluate_response, renderer=render):
     manifest, request = verifier(folder)
     with (folder / ".run.lock").open("a") as lock:
@@ -455,6 +465,7 @@ def run(folder, client=None, *, verifier=verify, evaluator=evaluate_response, re
         return result
 
 
+# Dispatch the command to prepare, verify, or run a scope evaluation.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("prepare", "run"))

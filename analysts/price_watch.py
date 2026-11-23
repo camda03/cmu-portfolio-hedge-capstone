@@ -24,14 +24,17 @@ DEFAULT_POLICY = dict(
 )
 
 
+# Encode a price-watch record in a stable JSON representation.
 def canonical(value):
     return json.dumps(value, sort_keys=True, allow_nan=False, separators=(",", ":"))
 
 
+# Fingerprint the canonical record to identify the exact watch or state.
 def digest(value):
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
+# Parse a timestamp and require an explicit time-zone offset.
 def instant(value):
     stamp = datetime.fromisoformat(value)
     if stamp.tzinfo is None:
@@ -39,10 +42,12 @@ def instant(value):
     return stamp
 
 
+# Check that a proposed price is a finite number greater than zero.
 def positive(value):
     return type(value) in (int, float) and math.isfinite(value) and value > 0
 
 
+# Build the price watch from a forecast, comparable daily closes, and its trigger policy.
 def make_watch(forecast, history, policy=None):
     """Require comparable daily closes with explicit no-action coverage for this raw-basis pilot."""
     f, p = copy.deepcopy(forecast), dict(DEFAULT_POLICY, **(policy or {}))
@@ -82,6 +87,7 @@ def make_watch(forecast, history, policy=None):
     return dict(watch, sha256=digest(watch))
 
 
+# Explain why a broker observation is unsuitable for evaluating this watch.
 def observation_problem(watch, o):
     f, p = watch["forecast"], watch["policy"]
     try:
@@ -132,6 +138,7 @@ def observation_problem(watch, o):
     return ""
 
 
+# Evaluate one price observation and return the proposed action and updated watch state.
 def evaluate(watch, observation, state=None, news=None):
     """One observation -> inspectable shadow action plus JSON-persistable next state."""
     if watch["sha256"] != digest({k: v for k, v in watch.items() if k != "sha256"}):
@@ -209,6 +216,7 @@ def evaluate(watch, observation, state=None, news=None):
             t, price, sigma = o["elapsed_sessions"], o["price"], watch["daily_sigma"]
             drift = math.log(f["target_price"] / f["reference_price"]) / 20
 
+            # Measure the price move in volatility units after accounting for elapsed sessions and drift.
             def score(base_price, base_t, q=price):
                 dt = max(t - base_t, p["time_floor_sessions"])
                 return (math.log(q / base_price) - drift * (t - base_t)) / (sigma * math.sqrt(dt))
@@ -299,6 +307,7 @@ def evaluate(watch, observation, state=None, news=None):
     return result
 
 
+# Replay the saved observations through the price watch and compare expected actions.
 def replay(suite):
     watch = make_watch(suite["forecast"], suite["history"], suite.get("policy"))
     rows = []
@@ -329,6 +338,7 @@ def replay(suite):
     )
 
 
+# Dispatch the price-watch command and write its requested results.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["replay"], nargs="?", default="replay")

@@ -25,10 +25,12 @@ POLICY = {
 }
 
 
+# Calculate the SHA-256 fingerprint of the supplied evidence bytes.
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+# Publish a complete JSON record by replacing its destination atomically.
 def write(path, value):
     """Atomic JSON publication; readers never see a partially written result."""
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -36,6 +38,7 @@ def write(path, value):
     temporary.replace(path)
 
 
+# Collect the published summary, article matches, and market paths in one packet.
 def build_evidence(pages, source_receipt):
     summary, cases = demo.packets(pages)
     market = json.loads(
@@ -87,6 +90,7 @@ def build_evidence(pages, source_receipt):
     }
 
 
+# Write the evidence packet and its hashes, then verify the saved copy.
 def export_evidence(pages, source_receipt, folder):
     packet = build_evidence(pages, source_receipt)
     folder = Path(folder)
@@ -122,6 +126,7 @@ def export_evidence(pages, source_receipt, folder):
     return load_evidence(folder)
 
 
+# Read the evidence files and check their hashes and run identifiers.
 def load_evidence(folder):
     folder = Path(folder)
     raw = (folder / "receipt.json").read_bytes()
@@ -141,6 +146,7 @@ def load_evidence(folder):
     return packet
 
 
+# Build the study page from the saved evidence, disclosures, and reader report.
 def render(folder):
     folder = Path(folder)
     packet = load_evidence(folder)
@@ -248,6 +254,7 @@ def render(folder):
     return folder / "index.html"
 
 
+# Create a dated delivery snapshot from the original evidence and research.
 def refresh(source, folder):
     """Create a new delivery snapshot; original evidence, narrative and receipts stay byte-identical."""
     source, folder = Path(source).resolve(), Path(folder).resolve()
@@ -275,6 +282,7 @@ def refresh(source, folder):
     return render(folder)
 
 
+# Start the local viewer for this saved research delivery.
 def serve(folder, port):
     folder = Path(folder)
     render(folder)
@@ -287,6 +295,7 @@ def serve(folder, port):
         "receipt.json",
     )
 
+    # Return the requested published file with its content type and access checks.
     def application(environ, start_response):
         name = environ.get("PATH_INFO", "/").removeprefix("/") or "index.html"
         ok = (
@@ -307,6 +316,7 @@ def serve(folder, port):
         server.serve_forever()
 
 
+# Choose the evidence export, page rendering, refresh, or serving command.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("export", "render", "serve", "refresh"))

@@ -9,6 +9,7 @@ from price_watch import digest, instant
 from securities import SUBJECTS
 
 
+# Check the referral's subject, cutoff, and origin before it enters a reassessment.
 def check_trigger(value, symbol, cutoff, context_only=False):
     """Return lineage fields; synthetic requests are restricted to context preparation."""
     try:
@@ -165,6 +166,7 @@ def check_trigger(value, symbol, cutoff, context_only=False):
         raise ValueError("Monitoring request is incomplete or malformed.") from error
 
 
+# Validate the text and list fields required in a set of handoff records.
 def records(values, strings, lists=()):
     """Check the small text/list records shared with the existing handoff schema."""
     if not isinstance(values, list):
@@ -185,6 +187,7 @@ def records(values, strings, lists=()):
     return values
 
 
+# Check that the monitor handoff identifies a forecast and valid destinations for its findings.
 def handoff_structure(value, forecast_id):
     """Validate structure and destinations; warning meaning still needs review."""
     keys = {
@@ -242,6 +245,7 @@ def handoff_structure(value, forecast_id):
     return value
 
 
+# Extract the identities and source attribution of discoveries already considered.
 def discovery_history(forecast):
     """Retain exact discovery identities and attribution without promoting leads."""
     history = {item["event"]["id"]: item for item in forecast.get("discovery_history", [])}
@@ -258,6 +262,7 @@ def discovery_history(forecast):
     return list(history.values())
 
 
+# Reconcile saved events with the discovery history carried by the forecast.
 def continuity_events(forecast, prior_events):
     """Identity lookup only; decision validation still excludes unverified leads."""
     events = {item["event"]["event_key"]: item["event"] for item in discovery_history(forecast)}
@@ -265,6 +270,7 @@ def continuity_events(forecast, prior_events):
     return events
 
 
+# List prior warnings and referrals that still require attention.
 def pending_attention(state):
     """Historical attention remains visible; incorporated evidence is not a new job."""
     pending = {}
@@ -290,6 +296,7 @@ def pending_attention(state):
     return pending
 
 
+# Check that the returned referral matches the pending evidence and its current disposition.
 def check_return(value, symbol, cutoff):
     """Bind the actual pending referrals and their current mitigation to the native run."""
     original, handoff, state = (
@@ -473,6 +480,7 @@ def check_return(value, symbol, cutoff):
     )
 
 
+# Verify that the revised forecast accounts for returned referrals and outstanding warnings.
 def check_return_output(forecast, trigger):
     """Require explicit referral dispositions and warning continuity before publication."""
     try:

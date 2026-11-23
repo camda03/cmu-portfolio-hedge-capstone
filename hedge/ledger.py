@@ -19,6 +19,7 @@ CENT = Decimal(".01")
 EASTERN = ZoneInfo("America/New_York")
 
 
+# Parse a timezone-aware ledger timestamp and convert it to UTC.
 def instant(value):
     stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if stamp.tzinfo is None:
@@ -26,6 +27,7 @@ def instant(value):
     return stamp.astimezone(timezone.utc)
 
 
+# Convert a ledger value to a finite decimal before using it in portfolio arithmetic.
 def number(value):
     result = Decimal(str(value))
     if not result.is_finite():
@@ -33,10 +35,12 @@ def number(value):
     return result
 
 
+# Round a dollar amount to the nearest cent using half-up rounding.
 def usd(amount):
     return format(amount.quantize(CENT, rounding=ROUND_HALF_UP), "f")
 
 
+# Open the paper journal and load or initialize the portfolio's opening balances.
 def open_book(db, seed=None):
     db.execute("""CREATE TABLE IF NOT EXISTS journal (
         id TEXT PRIMARY KEY, at TEXT NOT NULL, decision_day TEXT UNIQUE,
@@ -53,6 +57,7 @@ def open_book(db, seed=None):
     return seed
 
 
+# Determine the receipt for a valuation, hedge decision, or paper futures transaction.
 def outcome(event, seed):
     kind = event["kind"]
     if kind == "mark":
@@ -101,10 +106,11 @@ def outcome(event, seed):
         "status": "filled",
         "side": "buy" if qty > 0 else "sell",
         "contracts": abs(qty),
-        "fill_price": str(ask if qty > 0 else bid),
+        "fill_price": str(ask if qty > 0 else bid),  # Paper buys cross to the ask, sells to the bid.
     }
 
 
+# Append one uniquely identified event or return the receipt from its previous submission.
 def record(db, seed, event):
     key = event["id"]
     if key == "opening" or not all(
@@ -132,6 +138,7 @@ def record(db, seed, event):
     return result
 
 
+# Read the journal in booking order and attach each event's stored receipt.
 def entries(db, cutoff):
     rows = db.execute(
         """SELECT request, receipt FROM journal WHERE id != 'opening' AND at <= ?
@@ -141,6 +148,7 @@ def entries(db, cutoff):
     return [dict(json.loads(request), receipt=json.loads(receipt)) for request, receipt in rows]
 
 
+# Rebuild the portfolio and its unhedged comparison from the opening book and journal.
 def statement(seed, events):
     stocks = seed["equities"]
     base = number(seed["cash_usd"])
@@ -223,6 +231,7 @@ def statement(seed, events):
     )
 
 
+# Dispatch the command-line operation for inspecting or updating the paper ledger.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

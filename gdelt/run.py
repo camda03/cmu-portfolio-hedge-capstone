@@ -22,30 +22,37 @@ JOB_TIMEOUT_MS = 3_600_000  # BigQuery attempts cancellation after one hour.
 RESERVATION = os.environ.get("GDELT_RESERVATION")
 
 
+# Serialize run settings consistently so equivalent records produce the same hash.
 def encode(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
 
 
+# Hash a run record using its canonical JSON representation.
 def digest(value):
     return hashlib.sha256(encode(value).encode()).hexdigest()
 
 
+# Load a saved run or configuration record from JSON.
 def read(path):
     return json.loads(Path(path).read_text())
 
 
+# Replace the stored run state only after the new JSON is complete.
 def save(path, value):
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(encode(value) + "\n")
     temporary.replace(path)
 
 
+# Return the current UTC timestamp for a run receipt.
 def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+# Extract queue time, execution time, and resource usage from a BigQuery job.
 def measured_job(key, job_id, statistics):
     query = statistics.get("query", {})
+    # Convert the elapsed time between two BigQuery millisecond timestamps to seconds.
     seconds = lambda a, b: (
         (int(statistics[b]) - int(statistics[a])) / 1000
         if a in statistics and b in statistics
@@ -64,16 +71,19 @@ def measured_job(key, job_id, statistics):
     }
 
 
+# Put BigQuery parameters in a consistent order for checking resumed jobs.
 def canonical_parameters(parameters):
     config = bigquery.QueryJobConfig.from_api_repr({"query": {"queryParameters": parameters}})
     return sorted((p.to_api_repr() for p in config.query_parameters), key=lambda p: p["name"])
 
 
+# Stop the run when a required condition fails and report the supplied reason.
 def require(condition, message):
     if not condition:
         raise ValueError(message)
 
 
+# Fingerprint the runner, settings, and stage files used to produce the results.
 def code_hash():
     files = [ROOT / "run.py", ROOT / "runtime_defaults.json", ROOT / "stages_build.json"]
     files += sorted((ROOT / "sql").rglob("*.*")) + sorted((ROOT / "data").glob("*.json"))
@@ -82,6 +92,7 @@ def code_hash():
     )
 
 
+# Fill in the configured project and baseline dataset in the default settings.
 def runtime_defaults():
     # These bindings identify the operator's BigQuery installation.
     default_text = (ROOT / "runtime_defaults.json").read_text()
@@ -98,6 +109,7 @@ def runtime_defaults():
     )
 
 
+# Create the initial run checkpoint for the chosen operating mode.
 def prepare(path, mode):
     require(not path.exists(), "State already exists; use its original command to resume.")
     defaults = runtime_defaults()
@@ -125,6 +137,7 @@ def prepare(path, mode):
 
 
 class Run:
+    # Load the checkpoint and bind it to the configuration and BigQuery client.
     def __init__(self, path, client=None):
         self.path, self.state = path, read(path)
         self.config = self.state["config"]
@@ -151,9 +164,11 @@ class Run:
             "source_plan_json": encode(read(ROOT / "data/source_plan.json")),
         }
 
+    # Persist this runner's latest checkpoint.
     def save(self):
         save(self.path, self.state)
 
+    # Build a stage's SQL and query parameters from its settings and identifiers.
     def render(self, stage, extra=None, identifiers=None):
         spec = self.stages[stage]
         ids = self.config["identifiers"] | (identifiers or {})
@@ -171,11 +186,13 @@ class Run:
             )
         return sql, parameters
 
+    # Total billed bytes or outstanding reservations against the selected budget.
     def spent(self, kind):
         return sum(
             j.get("billed", j["reserved"]) for j in self.state["jobs"].values() if j["kind"] == kind
         )
 
+    # Submit or resume one BigQuery stage and record its result and resource use.
     def step(self, stage, scope="", extra=None, identifiers=None, ceiling=None, inputs=0):
         spec = self.stages[stage]
         sql, parameters = self.render(stage, extra, identifiers)
@@ -218,7 +235,7 @@ class Run:
         config = bigquery.QueryJobConfig(
             query_parameters=parameters,
             maximum_bytes_billed=cap,
-            use_query_cache=False,
+            use_query_cache=False,  # Use execution statistics from a fresh query.
             reservation=RESERVATION,
             job_timeout_ms=JOB_TIMEOUT_MS,
             labels={"gdelt_run": self.config["run_id"]},
@@ -331,10 +348,12 @@ class Run:
         print(encode({"state": "DONE", "stage": key, "job_id": job.job_id}), flush=True)
         return rows
 
+    # Execute the registered stages for a named workflow in order.
     def flow(self, workflow, scope="", extra=None, identifiers=None):
         for stage in self.workflows[workflow]:
             self.step(stage, scope, extra, identifiers)
 
+    # Validate or establish the BigQuery dataset that will receive this run's results.
     def destination(self):
         name = self.config["dataset"]
         try:
@@ -350,6 +369,7 @@ class Run:
             "Destination exists but does not belong to this run.",
         )
 
+    # Verify that external tables and settings match the inputs bound to this run.
     def bindings(self):
         defaults = runtime_defaults()
         names = set(defaults["mode_bindings"]["saved"]["identifiers"].values())
@@ -404,6 +424,7 @@ class Run:
                 "Expected daily ingestion-time partitions.",
             )
 
+    # Choose historical source batches and retain the plan for reproducible retries.
     def source_plan(self, cap, deficient=None):
         key = str(cap)
         if key in self.state["plans"]:
@@ -450,6 +471,7 @@ class Run:
         )
         return tasks
 
+    # Construct the historical corpus, lexical tables, and vector index.
     def build(self):
         require(
             self.config["mode"] == "filtered",
@@ -525,6 +547,7 @@ class Run:
         self.save()
         self.evaluate()
 
+    # Run the retrieval comparisons and build the evidence reports.
     def evaluate(self):
         require(
             self.config["mode"] == "saved" or self.state.get("built"),
@@ -588,6 +611,7 @@ class Run:
             )
         )
 
+    # Check the saved job evidence for actual use of the vector index.
     def index_evidence(self):
         record = self.state["jobs"]["/evaluate_ivf40"]
         if not any(
@@ -609,6 +633,7 @@ class Run:
             "ANN job has not demonstrated FULLY_USED vector-index evidence; inspect its retained job.",
         )
 
+    # Summarize the measured resource use and timing of the retrieval jobs.
     def performance(self):
         ledger = self.state["jobs"]
         jobs = [measured_job(k, v["job_id"], v.get("statistics", {})) for k, v in ledger.items()]
@@ -645,6 +670,7 @@ class Run:
             "production_capacity_proven": False,
         }
 
+    # Prepare and filter a time-bounded batch of incoming GDELT documents.
     def intake(self, start, raw_limit):
         require(
             self.state.get("built"), "Current-news admission requires a completed filtered build."
@@ -685,6 +711,7 @@ class Run:
         )
 
 
+# Select the index build, evaluation, intake, or reporting operation from the command line.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

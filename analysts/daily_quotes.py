@@ -12,6 +12,7 @@ from securities import SECURITIES
 NEW_YORK = ZoneInfo("America/New_York")
 
 
+# Validate the broker's last price and recover its original exchange timestamp.
 def reference(snapshot, symbol, cutoff):
     """Use the timestamp in IBKR's last field, including outside the regular session."""
     item = snapshot["observations"][symbol]
@@ -57,6 +58,7 @@ def reference(snapshot, symbol, cutoff):
     )
 
 
+# Recheck a previously saved price against the instrument and research cutoff.
 def saved_reference(observation, symbol, cutoff):
     packet = dict(
         schema="ibkr-last-v1",
@@ -72,6 +74,7 @@ def saved_reference(observation, symbol, cutoff):
     return checked
 
 
+# Collect and save the latest available broker price outside regular trading hours.
 def off_hours_snapshot(source_dir, folder, symbol):
     instrument = SECURITIES[symbol]
     request = dict(contract_id=instrument["contract_id"], market_data_names=["last"])

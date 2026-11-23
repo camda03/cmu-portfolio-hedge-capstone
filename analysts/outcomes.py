@@ -15,6 +15,7 @@ SYMBOLS = {"MSFT", "AAPL", "NVDA", "DELL", "DE", "WMT", "SP500"}
 TERMINAL = {"scored", "provisional"}
 
 
+# Parse an offset-aware observation time and express it in UTC.
 def stamp(value):
     result = datetime.fromisoformat(value)
     if result.tzinfo is None:
@@ -22,14 +23,17 @@ def stamp(value):
     return result.astimezone(timezone.utc)
 
 
+# Check that a value is a finite number suitable for scoring.
 def finite(value):
     return type(value) in (int, float) and math.isfinite(value)
 
 
+# Fingerprint the bytes of a saved forecast or observation.
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# Compare a forecast with its eligible outcome price or explain why it cannot yet be scored.
 def assess(forecast, observation, now):
     """Return an qualified reference-price comparison or an unscored status."""
     f = forecast
@@ -131,7 +135,7 @@ def assess(forecast, observation, now):
             or request["step"] != "ONE_DAY"
             or history["source"] != "Last"
             or history["chart_step"] != 86400
-            or not end.market_close <= retrieved <= now
+            or not end.market_close <= retrieved <= now  # Score only after the forecast horizon closes.
         ):
             raise ValueError(
                 "History identity, daily-bar settings or availability time does not match"
@@ -218,6 +222,7 @@ def assess(forecast, observation, now):
         return dict(status="needs_review", reason=str(error))
 
 
+# Find forecasts in the operational subject and run directories.
 def records(root):
     """Only operational subject/run folders; never recursively include benchmark arms."""
     return sorted(
@@ -225,6 +230,7 @@ def records(root):
     )
 
 
+# Score eligible forecasts against available prices and refresh the outcome ledger.
 def update(root, snapshot=None, collect=False, now=None):
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
@@ -329,6 +335,7 @@ def update(root, snapshot=None, collect=False, now=None):
         return summary
 
 
+# Collect completed outcomes that the analyst could have known at the new forecast cutoff.
 def feedback(root, symbol, cutoff):
     eligible = []
     for path in records(root):

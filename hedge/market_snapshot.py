@@ -8,6 +8,7 @@ import subprocess
 from hedge_session import SUBJECTS, read_json, require, save, session_hours
 
 
+# Extract the broker's structured data from the tool's response envelope.
 def broker_payload(raw):
     sources = [json.loads(c["text"]) for c in raw.get("content", []) if c.get("type") == "text"]
     if raw.get("structuredContent") is not None:
@@ -19,6 +20,7 @@ def broker_payload(raw):
     return sources[0]
 
 
+# Check a broker quote against the requested instrument and standardize its fields.
 def normalize(raw, request, received_at):
     data = broker_payload(raw)
     last = data["last"]
@@ -37,6 +39,7 @@ def normalize(raw, request, received_at):
     )
 
 
+# Request the required broker quotes and save a coherent hedge-market snapshot.
 def collect(broker_dir, policy, output, session):
     broker_dir, output = Path(broker_dir).resolve(), Path(output).resolve()
     catalog = read_json(broker_dir / "dashboard/securities.json")

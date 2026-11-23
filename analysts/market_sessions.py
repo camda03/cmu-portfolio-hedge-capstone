@@ -12,6 +12,7 @@ from securities import CALENDARS
 EXTENDED_HOURS_VERIFIED = frozenset()
 
 
+# Read the listing exchange's trading calendar around the requested time.
 def schedule(symbol, now, days_ahead=14, extended=False):
     if now.tzinfo is None:
         raise ValueError("A timezone-aware market clock is required.")
@@ -23,11 +24,13 @@ def schedule(symbol, now, days_ahead=14, extended=False):
     )
 
 
+# Find the most recent regular session whose closing time has passed.
 def completed_session(symbol, now):
     sessions = schedule(symbol, now)
-    return sessions[sessions.market_close <= now].iloc[-1]
+    return sessions[sessions.market_close <= now].iloc[-1]  # Exclude the session still trading.
 
 
+# Determine the current trading session and whether the configured feed may fetch a quote.
 def quote_session(symbol, now):
     """Calendar availability and verified feed access are distinct gates."""
     sessions = schedule(symbol, now, extended=True)

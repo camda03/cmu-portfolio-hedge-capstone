@@ -38,6 +38,7 @@ NOTICE = (
 )
 
 
+# Hash the recovery files so a resumed job can check which repair it is applying.
 def fingerprint():
     return engine.digest(
         {
@@ -49,6 +50,7 @@ def fingerprint():
 
 
 class RecoveryRun(engine.Run):
+    # Load the saved run and register the recovery SQL used by its remaining stages.
     def __init__(self, path, client=None):
         super().__init__(path, client=client)
         self.stages["recovery_gaps"] = {
@@ -72,6 +74,7 @@ class RecoveryRun(engine.Run):
         self.stages["corpus_guard"]["sql"] = "recovery/corpus_guard.sql"
         self.stages["corpus_guard"]["statement_count"] = 6
 
+    # Render the original stage query with the reviewed recovery changes applied.
     def render(self, stage, extra=None, identifiers=None):
         if stage == "evaluate_reports":
             extra = dict(extra or {})
@@ -88,6 +91,7 @@ class RecoveryRun(engine.Run):
         return sql, parameters
 
 
+# Validate the original checkpoint and build the state for the approved recovery run.
 def reviewed_state(original):
     engine.require(
         original.config["dataset"] == DATASET and original.config["mode"] == "filtered",
@@ -115,6 +119,7 @@ def reviewed_state(original):
     return state
 
 
+# Resume the interrupted run using the saved state and reviewed recovery settings.
 def main():
     original_path = ROOT / "filtered_state.json"
     path = ROOT / "quota_recovery_state.json"

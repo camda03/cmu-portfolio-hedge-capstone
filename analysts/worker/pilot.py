@@ -24,6 +24,7 @@ CODE = (
 )
 
 
+# Check the timing, subject, and operating limits of the hourly pilot.
 def validate_plan(plan):
     start, end = instant(plan["starts_at"]), instant(plan["ends_at"])
     if (
@@ -40,6 +41,7 @@ def validate_plan(plan):
     return plan
 
 
+# Build the pilot schedule from the supplied starting time.
 def plan_at(now):
     start = instant(now).astimezone(timezone.utc).replace(
         minute=0, second=0, microsecond=0
@@ -54,6 +56,7 @@ def plan_at(now):
     )
 
 
+# Save the pilot plan and prepare the worker to monitor its scheduled hours.
 def activate(folder, plan, old_code):
     validate_plan(plan)
     code = {name: digest((ROOT / name).read_bytes()) for name in CODE}
@@ -91,6 +94,7 @@ def activate(folder, plan, old_code):
         return saved
 
 
+# Build the Cloud Monitoring data point for the pilot's current health.
 def metric_body(project, pilot_id, healthy, now):
     return {
         "timeSeries": [
@@ -107,6 +111,7 @@ def metric_body(project, pilot_id, healthy, now):
     }
 
 
+# Define when the pilot health metric should notify the selected channel.
 def alert_policy(plan, channel):
     selector = (
         'resource.type="global" AND metric.type="' + METRIC + '"'
@@ -149,6 +154,7 @@ def alert_policy(plan, channel):
     )
 
 
+# Compare the saved alert's routing and thresholds with the requested policy.
 def matching_policy(policy, wanted):
     if (
         not policy.get("enabled", True)
@@ -170,6 +176,7 @@ def matching_policy(policy, wanted):
     return True
 
 
+# Set up the monitoring metric, notification channel, and alert for the pilot.
 def provision(project, folder, email):
     if "@" not in email or email.endswith(".gserviceaccount.com"):
         raise ValueError("Use the operator email address for failure notifications.")
@@ -186,6 +193,7 @@ def provision(project, folder, email):
     )
     base = "https://monitoring.googleapis.com/v3/projects/" + project + "/"
 
+    # Send an authenticated request to the project's monitoring API.
     def api(method, tail, body=None, params=None):
         response = session.request(method, base + tail, json=body, params=params, timeout=45)
         try:
@@ -212,6 +220,7 @@ def provision(project, folder, email):
             ) from None
         return response.json() if response.content else {}
 
+    # Follow page tokens to collect all matching monitoring resources.
     def listing(tail):
         items = []
         token = None

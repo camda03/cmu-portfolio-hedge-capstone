@@ -52,10 +52,12 @@ class ResearchReport(Record):
     questions: list[str]
 
 
+# Describe an array of strings for the reader's structured tool schemas.
 def strings():
     return {"type": "array", "items": {"type": "string"}}
 
 
+# Build a strict function definition for a tool the research model can call.
 def tool(name, description, properties):
     return {
         "type": "function",
@@ -100,12 +102,14 @@ TOOLS = [
 ]
 
 
+# Serialize research data consistently for hashing and publication.
 def encode(value):
     return json.dumps(
         value, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")
     )
 
 
+# Replace the result file only after its complete contents have been written.
 def save(path, value):
     temporary = path.with_suffix(path.suffix + ".tmp")
     with temporary.open("w", encoding="utf-8") as handle:
@@ -115,10 +119,12 @@ def save(path, value):
     temporary.replace(path)
 
 
+# Calculate a stable content hash for a research record.
 def digest(value):
     return hashlib.sha256(encode(value).encode()).hexdigest()
 
 
+# Index each retrieved article pair by its query and historical document IDs.
 def pairs(cases):
     return {
         (case["query"]["document_id"], record["document_id"]): record["observed_day"]
@@ -128,6 +134,7 @@ def pairs(cases):
     }
 
 
+# Answer a reader tool call from the saved evidence packet.
 def read_tool(evidence, name, arguments):
     """Only immutable packet records are readable; there are no SQL, network or order tools."""
     if name == "read_article_matches":
@@ -171,6 +178,7 @@ def read_tool(evidence, name, arguments):
     raise ValueError("Unknown evidence tool.")
 
 
+# Summarize the available evidence so the reader can choose what to inspect.
 def overview(evidence):
     summary = {
         key: value
@@ -185,6 +193,7 @@ def overview(evidence):
     return summary
 
 
+# Check the report's citations against the packet and the pairs the reader opened.
 def validate_report(report, evidence, seen_pairs):
     """Accept citations only for article pairs the reader opened and that appear in the saved evidence."""
     known = pairs(evidence["articles"]["cases"])
@@ -204,6 +213,7 @@ def validate_report(report, evidence, seen_pairs):
                 )
 
 
+# Run the reader's evidence requests and validate its final research report.
 def analyze(
     evidence_dir,
     output,
@@ -479,6 +489,7 @@ def analyze(
             raise
 
 
+# Load an evidence packet and run or resume the requested research operation.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence", type=Path, required=True)

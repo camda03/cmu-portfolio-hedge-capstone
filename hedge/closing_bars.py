@@ -23,6 +23,7 @@ CONIDS = {
 }
 
 
+# Map the configured stocks, index, and futures month to their broker instruments.
 def contracts(future):
     contract = "MES-" + future["contract_month"]
     require(
@@ -43,6 +44,7 @@ def contracts(future):
     return contract, instruments
 
 
+# Find sessions for which every required exchange had closed by the cutoff.
 def completed_sessions(at):
     import pandas as pd
     import pandas_market_calendars as mcal
@@ -56,6 +58,7 @@ def completed_sessions(at):
     return closes[closes.max(axis=1) <= at]
 
 
+# Build a common closing-price snapshot from the broker bars for all required instruments.
 def close_market(capture, future, now):
     contract, identities = contracts(future)
     rows = capture["instruments"]
@@ -135,6 +138,7 @@ def close_market(capture, future, now):
     )
 
 
+# Request and save the broker's daily bars for each instrument in the policy.
 def capture_bars(broker_dir, policy, out, step_count=5):
     _, instruments = contracts(policy["future"])
     rows = []
@@ -167,6 +171,7 @@ def capture_bars(broker_dir, policy, out, step_count=5):
     return market["session_date"]
 
 
+# Estimate stock betas from the most recent 63 shared daily returns.
 def calibrated_policy(capture, policy, session, mode, now):
     """Price-return betas on the most recent 63 common complete daily returns."""
     import pandas as pd
@@ -184,7 +189,7 @@ def calibrated_policy(capture, policy, session, mode, now):
                 instant(value).astimezone(EASTERN).date().isoformat() for value in bars["time"]
             ]
             series[row["symbol"]] = pd.Series(bars["close"], index=dates, dtype=float)
-    prices = pd.DataFrame(series).sort_index().loc[:price_day].tail(64)
+    prices = pd.DataFrame(series).sort_index().loc[:price_day].tail(64)  # 64 closes yield 63 daily returns.
     require(
         len(prices) == 64 and prices.notna().all().all() and (prices > 0).all().all(),
         "Need 64 aligned positive IBKR daily closes for every equity and the cash index.",

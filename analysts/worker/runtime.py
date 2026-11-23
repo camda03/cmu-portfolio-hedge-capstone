@@ -11,6 +11,7 @@ AUTH_FILES = ("secrets.json", "secret-key", "oauth.json")
 OPTIONAL_AUTH_FILES = ("oauth.json.namespaces.json",)
 
 
+# Encode the broker authentication files for storage as a single bundle.
 def auth_bundle(auth):
     files = {n: base64.b64encode((auth / n).read_bytes()).decode() for n in AUTH_FILES}
     files.update(
@@ -23,6 +24,7 @@ def auth_bundle(auth):
     return files
 
 
+# Validate the bundle's file list and decode its contents.
 def unpack_bundle(value):
     if not set(AUTH_FILES) <= set(value) <= set(AUTH_FILES + OPTIONAL_AUTH_FILES):
         raise ValueError("Authentication bundle must include the OAuth index, vault and key.")
@@ -35,6 +37,7 @@ def unpack_bundle(value):
     return files
 
 
+# Create one authentication file exclusively with restricted permissions.
 def put_auth(path, value):
     with path.open("xb") as stream:
         os.chmod(path, 0o600)
@@ -48,6 +51,7 @@ def put_auth(path, value):
         os.close(descriptor)
 
 
+# Read the requested secret version from the configured Google Cloud project.
 def secret(name):
     project = os.environ["CAPSTONE_PROJECT"]
     resource = f"projects/{project}/secrets/{name}/versions/latest"
@@ -58,6 +62,7 @@ def secret(name):
     )
 
 
+# Check the broker files and load the model credential for the worker process.
 def credentials():
     auth = Path.home() / ".config/capstone-ibkr-paper"
     if not all((auth / n).is_file() for n in AUTH_FILES):
@@ -67,6 +72,7 @@ def credentials():
         raise ValueError("Approved API credential is empty.")
 
 
+# Install the saved broker bundle into a new worker authentication directory.
 def initialize_auth():
     auth = Path.home() / ".config/capstone-ibkr-paper"
     if auth.exists():
@@ -79,6 +85,7 @@ def initialize_auth():
         put_auth(auth / name, value)
 
 
+# Restore the broker's missing OAuth index after matching the original vault and key.
 def restore_missing_index():
     """Repair the v1 omission only when the original vault/key still match exactly."""
     auth = Path.home() / ".config/capstone-ibkr-paper"

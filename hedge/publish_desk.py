@@ -15,6 +15,7 @@ from hedge_session import ROOT, marked_book, read_json, session_hours
 from ledger import instant, open_book
 
 
+# Find the most recent eligible closing decision with the required output files.
 def latest(root):
     found = []
     for pattern in ("live/*/decision.json", "closing-rehearsals/*/decision.json"):
@@ -39,6 +40,7 @@ def latest(root):
     return max(found)[1]
 
 
+# Collect a fresh market observation for tracking a previously recorded hedge.
 def observe(root, session, broker_dir):
     from market_snapshot import collect
 
@@ -56,6 +58,7 @@ def observe(root, session, broker_dir):
     print("Recorded a qualified MES observation for " + session)
 
 
+# Recover the saved decision history from Cloud Storage when it is available.
 def restore_history(root, bucket):
     from google.api_core.exceptions import NotFound
 
@@ -76,6 +79,7 @@ def restore_history(root, bucket):
         candidate.replace(db)
 
 
+# Back up the SQLite history with a storage generation check to protect concurrent updates.
 def backup_history(root, bucket, now):
     from google.api_core.exceptions import NotFound
 
@@ -99,6 +103,7 @@ def backup_history(root, bucket, now):
         pointer.upload_from_filename(str(snapshot), if_generation_match=generation)
 
 
+# Publish the dated decision artifacts and update the desk's current view.
 def publish(root, blob, gdelt=None):
     from google.api_core.exceptions import NotFound, PreconditionFailed
 

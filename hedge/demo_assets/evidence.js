@@ -2,9 +2,11 @@ const quality = d.freshness?.rows || [];
 const warnings = quality.filter((row) => !["Current", "Replay close", "Reference", "Dated"].includes(row
   .status));
 const journal = d.history || [];
+// Choose a calendar-date or timestamp format to match the source.
 const prettyDate = (value) => (!value ? "—" : /^\d{4}-\d{2}-\d{2}$/.test(value) ? calendarDay(value) :
   et(value));
 
+// Determine whether the saved market observations need an age warning.
 function archiveWarning() {
   const now = Date.now(),
     f = d.freshness;
@@ -24,6 +26,7 @@ function archiveWarning() {
   return "";
 }
 
+// Summarize source-date issues and link to the detailed evidence dates.
 function freshnessBanner() {
   if (!quality.length)
     return '<div class="warning-strip">Source dates unavailable. ' + linkPage("freshness",
@@ -52,6 +55,7 @@ function freshnessBanner() {
   );
 }
 
+// Group decision inputs by source and display their recorded dates and status.
 function freshnessPage() {
   const grouped = [...new Set(quality.map((row) => row.group))];
   return (
@@ -93,6 +97,7 @@ function freshnessPage() {
   );
 }
 
+// Summarize past hedge decisions and the outcomes available for comparison.
 function journalPage() {
   const scored = journal.filter((row) => row.outcome);
   const helped = scored.filter((row) => row.outcome.result === "Helped").length,

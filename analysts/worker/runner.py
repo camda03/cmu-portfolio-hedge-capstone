@@ -19,6 +19,7 @@ SEED_SHA = os.environ.get("MONITOR_SEED_SHA256")
 SEED_FILES = ("result.json", "request.json", "state-before.json", "state-after.json")
 
 
+# Initialize the worker's local baseline and verify it against the supplied seed.
 def prepare(folder, seed):
     folder.mkdir(parents=True, exist_ok=True)
     with (folder / ".worker.lock").open("a") as lock:
@@ -60,6 +61,7 @@ def prepare(folder, seed):
         write(folder / "worker.json", config)
 
 
+# Record and publish the worker's status, timing, and reason.
 def health(folder, store, status, reason, **extra):
     boot = Path("/proc/sys/kernel/random/boot_id")
     value = dict(
@@ -101,6 +103,7 @@ def health(folder, store, status, reason, **extra):
     return value
 
 
+# Process the next eligible monitoring hour under the worker's exclusive lock.
 def tick(folder, store, client=None, now=None, broker=True, dispatch=True):
     with (folder / ".worker.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -219,6 +222,7 @@ def tick(folder, store, client=None, now=None, broker=True, dispatch=True):
     return tick(folder, store, client=client, now=now, broker=broker, dispatch=False)
 
 
+# Read the command line and prepare the worker or advance its monitoring session.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("prepare", "tick"))

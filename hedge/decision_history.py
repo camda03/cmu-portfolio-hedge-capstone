@@ -12,10 +12,12 @@ from pathlib import Path
 from ledger import EASTERN, MULTIPLIER, instant, number, usd
 
 
+# Locate the history database for this output directory or its configured override.
 def location(output):
     return Path(os.environ.get("HEDGE_HISTORY_DB") or Path(output) / "decision-history.sqlite3")
 
 
+# Open the SQLite history store and create the decision and market-mark tables as needed.
 def database(path):
     path.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(path, timeout=20)
@@ -29,6 +31,7 @@ def database(path):
     return db
 
 
+# Store a dated market observation that can later be used to score a decision.
 def remember_mark(db, market, available):
     if not market or market.get("synthetic"):
         return
@@ -62,7 +65,9 @@ def remember_mark(db, market, available):
     )
 
 
+# Register a completed decision, its supporting evidence, and its initial market mark.
 def archive(db, folder):
+    # Read a named JSON artifact from this completed decision's directory.
     def read(name):
         return json.loads((folder / name).read_bytes())
 
@@ -148,6 +153,7 @@ def archive(db, folder):
     remember_mark(db, market, when)
 
 
+# Score pending decisions when a qualifying later market observation is available.
 def settle(db, now):
     pending = db.execute(
         """SELECT d.id,d.contract,d.decided,d.data,s.data FROM decisions d
@@ -184,7 +190,7 @@ def settle(db, now):
         row = json.loads(raw)
         move = (number(mark[2]) - number(start["price"])) * MULTIPLIER
         fee = number(row["fee_usd"])
-        effect = (row["target"] - row["previous"]) * move - fee
+        effect = (row["target"] - row["previous"]) * move - fee  # Compare with keeping the old hedge.
         out = {
             "observed": mark[0],
             "available": mark[1],
@@ -201,6 +207,7 @@ def settle(db, now):
         db.execute("INSERT INTO outcomes VALUES (?,?,?)", (key, mark[1], json.dumps(out)))
 
 
+# Return decisions and subsequent outcomes that were knowable at the requested time.
 def history(path, as_of, market=None, folder=None, limit=24):
     """Use only decisions and follow-up marks available by as_of. Recover completed prior runs on first read."""
     cutoff = as_of.astimezone(timezone.utc).isoformat()
@@ -233,6 +240,7 @@ def history(path, as_of, market=None, folder=None, limit=24):
         ]
 
 
+# Select past decisions and outcome counts for the model's next review.
 def model_experience(path, now, market):
     rows = history(path, now, market, limit=-1)
     counts = Counter(row["outcome"]["result"] if row["outcome"] else "Pending" for row in rows)
@@ -246,6 +254,7 @@ def model_experience(path, now, market):
     }
 
 
+# Archive the finished run and export the updated decision history alongside it.
 def complete(folder, path, now):
     from hedge_session import save
 

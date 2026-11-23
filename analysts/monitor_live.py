@@ -104,12 +104,14 @@ class Observation(Strict):
     decision: Decision
 
 
+# Encode a monitor record as compact, consistently ordered JSON.
 def compact(value):
     return json.dumps(
         value, separators=(",", ":"), sort_keys=True, ensure_ascii=True, allow_nan=False
     )
 
 
+# Parse an offset-aware timestamp and convert it to UTC.
 def instant(value):
     value = datetime.fromisoformat(value)
     if value.tzinfo is None:
@@ -117,6 +119,7 @@ def instant(value):
     return value.astimezone(timezone.utc)
 
 
+# Extract the provider's failure identifiers for the audit record.
 def provider_error(raw):
     """Retain machine-readable failure identity, without account URLs or error prose."""
     error = raw.get("error") or {}
@@ -129,6 +132,7 @@ def provider_error(raw):
     }
 
 
+# Accept the requested model name or its dated version.
 def matches_model(actual, requested):
     return actual == requested or bool(
         isinstance(actual, str)
@@ -136,6 +140,7 @@ def matches_model(actual, requested):
     )
 
 
+# Identify a recorded provider overload that may safely qualify for a retry.
 def confirmed_overload(response, response_id, model):
     error = provider_error(response)
     returned_model = response.get("model")
@@ -155,6 +160,7 @@ def confirmed_overload(response, response_id, model):
     )
 
 
+# Validate the web address before using it as a source.
 def web_url(value):
     url = urlsplit(value)
     if url.scheme not in ("http", "https") or not url.hostname or url.username or url.password:
@@ -162,6 +168,7 @@ def web_url(value):
     return value
 
 
+# Check the forecast watch and its condition identifiers before monitoring begins.
 def validate_watch(watch):
     ids = [c["id"] for c in watch["conditions"]]
     checks = [c["id"] for c in watch["checks"]]
@@ -184,10 +191,12 @@ def validate_watch(watch):
     return watch
 
 
+# Create empty checkpoints and event history tied to this watch's fingerprint.
 def initial_state(watch):
     return dict(watch_sha256=digest(compact(watch)), checkpoints={}, prior_events=[], attention={})
 
 
+# Recover the latest accepted monitor state from saved cycle records.
 def recover_state(folder, watch):
     state = (
         read(folder / "state.json") if (folder / "state.json").exists() else initial_state(watch)
@@ -211,6 +220,7 @@ def recover_state(folder, watch):
     return state
 
 
+# Build the model request from the active watch, prior state, and evidence cutoff.
 def request_for(watch, state, cutoff, cycle, ibkr, model=SETTINGS["model"]):
     if model not in TOKEN_RATES:
         raise ValueError("Unknown research-test model.")
@@ -258,6 +268,7 @@ def request_for(watch, state, cutoff, cycle, ibkr, model=SETTINGS["model"]):
     return request, payload
 
 
+# Freeze the live monitor's watch and configuration in a new work directory.
 def prepare(watch_path, folder, model=SETTINGS["model"]):
     watch = validate_watch(read(watch_path))
     source = (ROOT / watch["source_report_path"]).resolve()
@@ -338,6 +349,7 @@ def prepare(watch_path, folder, model=SETTINGS["model"]):
     )
 
 
+# Recheck the frozen files and load the watch saved for this monitor.
 def verify(folder):
     manifest = read(folder / "manifest.json")
     if (
@@ -354,6 +366,7 @@ def verify(folder):
     return validate_watch(read(folder / "frozen" / "watch.json"))
 
 
+# Collect the instrument's broker observations and record any collection failure.
 def collect_ibkr(folder, watch, *, now=None, cache_dir=None):
     clock = instant(now or stamp())
     request = dict(
@@ -468,6 +481,7 @@ def collect_ibkr(folder, watch, *, now=None, cache_dir=None):
         return dict(record, status="unavailable", error_type=type(error).__name__)
 
 
+# Extract the URLs and search calls that support the model's reported findings.
 def trace_sources(raw):
     calls = [x for x in raw.get("output", []) if x.get("type") == "web_search_call"]
     completed = [x.get("action") or {} for x in calls if x.get("status") == "completed"]
@@ -483,6 +497,7 @@ def trace_sources(raw):
     return urls, calls
 
 
+# Validate the response, its evidence, and the proposed next action for this cycle.
 def validate_observation(raw, text, watch, state, payload, model=SETTINGS["model"]):
     returned_model = raw.get("model") or ""
     if (returned_model != model and not returned_model.startswith(model + "-")) or raw.get(
@@ -572,6 +587,7 @@ def validate_observation(raw, text, watch, state, payload, model=SETTINGS["model
     return value, action_for(decision, packet), packet, calls
 
 
+# Fingerprint an event's source and version details so duplicate evidence can be recognized.
 def evidence_key(event):
     return digest(
         compact(
@@ -585,6 +601,7 @@ def evidence_key(event):
     )
 
 
+# Apply accepted events to a copy of the state and assemble the next handoff.
 def advance(state, value, handoff, cutoff):
     result = json.loads(compact(state))
     events = {e["event_key"]: e for e in state["prior_events"]}
@@ -618,7 +635,9 @@ def advance(state, value, handoff, cutoff):
     return result, dict(new=new, type=handoff["action"], execute=False)
 
 
+# Write a readable HTML account of the completed monitoring cycle.
 def render(folder, result):
+    # Escape a value and display it as preformatted text in the HTML summary.
     def pre(value):
         return (
             "<pre>"
@@ -685,6 +704,7 @@ def render(folder, result):
     write(folder / "summary.html", html)
 
 
+# Calculate a retry delay for an explicitly temporary provider refusal.
 def rate_delay(error, number):
     """A retry is safe only after an explicit temporary provider refusal."""
     from openai import RateLimitError
@@ -722,6 +742,7 @@ def rate_delay(error, number):
     return delay + random.uniform(0, 3)
 
 
+# Stream a discovery request and record its response identifier as soon as it arrives.
 def streamed_discovery(client, request, target, result):
     deadline = monotonic() + 7200
     for number in count():
@@ -755,6 +776,7 @@ def streamed_discovery(client, request, target, result):
     raise RuntimeError("Discovery stream ended before its terminal receipt.")
 
 
+# Poll the existing provider response by its saved identifier.
 def retrieve_response(client, response_id):
     """Retry only an idempotent status read; never resubmit the research request."""
     return client.with_options(max_retries=2).responses.retrieve(
@@ -762,6 +784,7 @@ def retrieve_response(client, response_id):
     )
 
 
+# Validate and account for a completed response before saving the cycle outcome.
 def complete_response(result, response, watch, state, payload, model, validator, advancer):
     """The same acceptance and cost checks serve fresh and recovered responses."""
     raw = response.model_dump(mode="json")
@@ -836,6 +859,7 @@ def complete_response(result, response, watch, state, payload, model, validator,
     return result
 
 
+# Recover a known response after polling was interrupted.
 def reconcile_cycle(
     folder,
     client,
@@ -965,6 +989,7 @@ def reconcile_cycle(
         return receipt
 
 
+# Run one monitoring cycle under its saved watch and persist the outcome.
 def run_cycle(
     folder,
     cycle,
@@ -1167,6 +1192,7 @@ def run_cycle(
         return result
 
 
+# Run the requested preparation, verification, or monitoring command.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("prepare", "run"))

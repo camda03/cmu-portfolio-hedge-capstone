@@ -7,6 +7,7 @@ from pathlib import Path
 from research_evidence import load_evidence, render, write
 
 
+# Count detected headline languages and record how much of the packet was classifiable.
 def headline_languages(packet):
     from lingua import LanguageDetectorBuilder
 
@@ -43,6 +44,7 @@ def headline_languages(packet):
     }
 
 
+# Add the language counts to the saved study and regenerate its presentation.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)

@@ -50,12 +50,14 @@ PROVIDER_ERRORS = {
 }
 
 
+# Serialize a publication to stable JSON bytes for storage and checksum verification.
 def encode(value):
     return json.dumps(
         value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
     )
 
 
+# Parse a publication timestamp and normalize it to UTC.
 def instant(value):
     dt = datetime.fromisoformat(value)
     if dt.tzinfo is None:
@@ -63,10 +65,12 @@ def instant(value):
     return dt.astimezone(timezone.utc)
 
 
+# Copy the requested fields from a research record into a smaller view.
 def select(value, keys):
     return {key: value[key] for key in keys if key in value}
 
 
+# Read one completed monitor cycle and assemble the record the dashboard publishes.
 def load_cycle(folder, symbol):
     """Use a terminal cycle, not a summary or an unaccepted model draft."""
     folder = Path(folder)
@@ -225,10 +229,12 @@ def load_cycle(folder, symbol):
 class Store:
     """GCS conditional writes; filesystem equivalent solely for offline rehearsal."""
 
+    # Select a local directory or a Cloud Storage bucket as the backing store.
     def __init__(self, uri):
         self.root = None if uri.startswith("gs://") else Path(uri)
         self.bucket = storage.Client().bucket(uri[5:]) if self.root is None else None
 
+    # Read a stored record and its generation so a later write can detect a conflict.
     def get(self, key):
         if self.root is not None:
             try:
@@ -240,9 +246,10 @@ class Store:
         if blob is None:
             return None, 0
         return json.loads(
-            blob.download_as_bytes(if_generation_match=int(blob.generation), timeout=30)
+            blob.download_as_bytes(if_generation_match=int(blob.generation), timeout=30)  # Read the version just inspected.
         ), int(blob.generation)
 
+    # Save a record only if its current generation matches the caller's expectation.
     def put(self, key, value, generation):
         data = encode(value)
         if self.root is None:
@@ -265,6 +272,7 @@ class Store:
             os.replace(tmp.name, path)
 
 
+# Write the cycle record and advance the subject's published pointers.
 def publish(store, record):
     """Record first, then an atomic per-subject pointer; replay never calls research."""
     symbol = record["symbol"]
@@ -315,6 +323,7 @@ def publish(store, record):
     raise RuntimeError("Index is busy. Re-publish this saved cycle; do not repeat research.")
 
 
+# Summarize the subject's published research and any issues that need attention.
 def research_status(store, symbol, now):
     """Separate the saved monitor recommendation from the latest worker check."""
     unknown = dict(label="Current research status unavailable", checked_at=None, attention=True)
@@ -366,6 +375,7 @@ def research_status(store, symbol, now):
         return unknown
 
 
+# Build the dashboard rows from the latest available records for each subject.
 def overview(store, now=None, symbols=SUBJECTS):
     now = now or datetime.now(timezone.utc)
     rows = []
@@ -412,6 +422,7 @@ def overview(store, now=None, symbols=SUBJECTS):
 app = Flask(__name__)
 
 
+# Adapt saved research wording for display while preserving the underlying publication.
 @app.template_filter("research_copy")
 def research_copy(value):
     """Use the published team name in saved research prose. The JSON evidence keeps its original bytes."""
@@ -429,11 +440,13 @@ def research_copy(value):
     )
 
 
+# Translate a stored reason code into a label for the dashboard.
 @app.template_filter("reason_label")
 def reason_label(value):
     return PROVIDER_ERRORS.get(value, value.replace("_", " "))
 
 
+# Format a stored timestamp for readers in US Eastern time.
 @app.template_filter("eastern")
 def eastern(value):
     return (
@@ -443,6 +456,7 @@ def eastern(value):
     )
 
 
+# Return a link only when its address is suitable for display in research.
 @app.template_filter("safeurl")
 def safeurl(value):
     parsed = urlsplit(value)
@@ -456,6 +470,7 @@ def safeurl(value):
     )
 
 
+# Read the subject overview from the report store configured for this service.
 def current_rows():
     uri = os.environ.get("REPORT_STORE")
     if not uri:
@@ -463,6 +478,7 @@ def current_rows():
     return overview(Store(uri))
 
 
+# Look up the published status of the monitoring workers.
 def fleet_status():
     try:
         return Store(os.environ["REPORT_STORE"]).get("fleet-operations.json")[0]
@@ -470,6 +486,7 @@ def fleet_status():
         return dict(phase="status_unavailable", subjects={}, reasons=["Status could not be read."])
 
 
+# Render the research overview with coverage for the configured subjects.
 @app.get("/")
 def home():
     return render_template(
@@ -477,6 +494,7 @@ def home():
     )
 
 
+# Render the research dashboard for a single selected subject.
 @app.get("/target/<symbol>")
 def detail(symbol):
     if symbol not in SUBJECTS:
@@ -500,6 +518,7 @@ def detail(symbol):
     )
 
 
+# Resolve the subject's current report pointer to its publication key and record.
 def active_report(store, symbol):
     pointer, _ = store.get(f"reassessments/{symbol}.json")
     if not pointer:
@@ -526,6 +545,7 @@ def active_report(store, symbol):
     return key, record
 
 
+# Gather the selected reports and their monitoring status into a portfolio research packet.
 def portfolio_research(store, symbols=SUBJECTS, fleet=None, now=None):
     now = now or datetime.now(timezone.utc)
     reports = {}
@@ -621,6 +641,7 @@ def portfolio_research(store, symbols=SUBJECTS, fleet=None, now=None):
     )
 
 
+# Serve portfolio research as JSON for one subject or the full coverage list.
 @app.get("/api/portfolio-research", defaults={"symbol": None})
 @app.get("/api/portfolio-research/<symbol>")
 def api_portfolio_research(symbol):
@@ -634,6 +655,7 @@ def api_portfolio_research(symbol):
     return jsonify(payload), 200 if payload["all_reports_available"] else 503
 
 
+# Return the original bytes of an archived JSON publication.
 def stored_json(key):
     uri = os.environ.get("REPORT_STORE")
     if not uri:
@@ -652,6 +674,7 @@ def stored_json(key):
     return app.response_class(raw, mimetype="application/json")
 
 
+# Serve the research completion receipt for the requested calendar date.
 @app.get("/api/daily-research/<session_date>/status")
 def daily_research_status(session_date):
     try:
@@ -663,6 +686,7 @@ def daily_research_status(session_date):
     return stored_json(f"daily-research/{session_date}/status.json")
 
 
+# Serve the frozen seven-report packet for the requested research run.
 @app.get("/api/portfolio-research/test/<test_id>")
 def portfolio_closeout(test_id):
     if not re.fullmatch(r"securities-\d{8}T\d{6}Z", test_id):
@@ -670,6 +694,7 @@ def portfolio_closeout(test_id):
     return stored_json(f"portfolio-research/{test_id}.json")
 
 
+# Return the dashboard's current subject rows and worker status as JSON.
 @app.get("/api/status")
 def api_status():
     return jsonify(
@@ -679,11 +704,13 @@ def api_status():
     )
 
 
+# Respond to a service health check.
 @app.get("/healthz")
 def health():
     return {"viewer": "ready", "worker_health": "not_assessed"}
 
 
+# Set caching and browser security headers on every dashboard response.
 @app.after_request
 def headers(response):
     response.headers.update(

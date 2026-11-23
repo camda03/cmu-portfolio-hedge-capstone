@@ -74,6 +74,7 @@ class ComparedObservation(Observation):
     referral_case: ReferralCase
 
 
+# Decide whether a reported change justifies reassessment against the existing forecast.
 def qualify_referral(value, payload):
     """Missing comparison remains a watch item; it cannot start full research."""
     case, decision = value["referral_case"], value["decision"]
@@ -108,6 +109,7 @@ def qualify_referral(value, payload):
     return value
 
 
+# Load the watch, starting state, and files needed for the chosen monitoring cycle.
 def inputs(root, successor=False):
     if successor:
         return successor_inputs(root)
@@ -192,6 +194,7 @@ def inputs(root, successor=False):
     return watch, dict(seed, watch_sha256=digest(live.compact(watch))), tuple(files)
 
 
+# Reconstruct the next monitor's watch and starting state from the accepted handoff.
 def successor_inputs(root):
     provenance = read(root / SUCCESSOR / "provenance.json")
     required = {
@@ -341,6 +344,7 @@ def successor_inputs(root):
     )
 
 
+# Evaluate the current broker observation against the watch's price conditions.
 def price_check(watch, ibkr, cutoff):
     mapped = market.forecast_fields(watch["forecast"], price_basis="unverified")
     result = dict(
@@ -399,6 +403,7 @@ def price_check(watch, ibkr, cutoff):
     return result
 
 
+# Build a news-monitor request that includes prior findings and the current price check.
 def request_for(watch, state, cutoff, cycle, ibkr, model=MODEL, *, baseline_report=None):
     if model != MODEL or live.instant(cutoff) < live.instant(
         state.get("last_completed_cycle_at", state["last_observation_at"])
@@ -490,6 +495,7 @@ def request_for(watch, state, cutoff, cycle, ibkr, model=MODEL, *, baseline_repo
     return request, payload
 
 
+# Collect the source records and search calls reported by the provider.
 def source_trace(raw):
     urls, calls = live.trace_sources(raw)
     records = {url: ["completed_web_action"] for url in urls}
@@ -504,6 +510,7 @@ def source_trace(raw):
     return records, calls
 
 
+# Build a URL comparison key for matching citations to their source traces.
 def source_locator(url):
     """Build a comparison key with urllib; retain the provider's original URL.
 
@@ -538,6 +545,7 @@ def source_locator(url):
     return parts.geturl()
 
 
+# Match reported sources to traced URLs and retain unsupported leads for follow-up.
 def match_sources(value, traces):
     """Shared attribution gate: exact traced URLs or preserved, unverified leads."""
     normalizations, rejections = [], []
@@ -581,6 +589,7 @@ def match_sources(value, traces):
     return normalizations, rejections, unverified
 
 
+# Check the new observation's evidence and determine whether it warrants a referral.
 def validate_observation(raw, text, watch, state, payload, model=MODEL):
     if (
         raw.get("status") != "completed"
@@ -714,6 +723,7 @@ def validate_observation(raw, text, watch, state, payload, model=MODEL):
     )
 
 
+# Record accepted changes and build the handoff for the next monitoring cycle.
 def advance(state, value, handoff, cutoff):
     result = read_copy(state)
     prior = {e["event_key"]: e for e in state["prior_events"]}
@@ -785,10 +795,12 @@ def advance(state, value, handoff, cutoff):
     return result, dict(new=new, type=handoff["action"], execute=False)
 
 
+# Make an independent JSON copy before updating the monitor state.
 def read_copy(value):
     return json.loads(live.compact(value))
 
 
+# Write an HTML summary of the monitoring result for inspection.
 def render(folder, result):
     write(
         folder / "summary.html",
@@ -799,6 +811,7 @@ def render(folder, result):
     )
 
 
+# Freeze the inputs for a new monitor sequence or a successor sequence.
 def prepare(folder, root=ROOT, successor=False):
     watch, seed, dependencies = inputs(root, successor)
     extra = (
@@ -873,6 +886,7 @@ def prepare(folder, root=ROOT, successor=False):
     )
 
 
+# Check the saved sequence against its manifest and return the accepted watch.
 def verify(folder):
     manifest = read(folder / "manifest.json")
     identity = {k: v for k, v in manifest.items() if k != "fingerprint"}
@@ -899,6 +913,7 @@ def verify(folder):
     return watch
 
 
+# Run the planned monitoring cycles under a lock and save their results.
 def run(folder, client=None, broker=True, times=None):
     with (folder / ".chain.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -962,6 +977,7 @@ def run(folder, client=None, broker=True, times=None):
         return summary
 
 
+# Dispatch the command to prepare, check, or run a monitoring sequence.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("prepare", "run"))

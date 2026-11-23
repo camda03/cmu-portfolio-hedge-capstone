@@ -42,11 +42,13 @@ class ReportError(ValueError):
     """A safe, actionable report-validation message."""
 
 
+# Reject a report whose receipt or stored contents fail a required check.
 def require(condition, message):
     if not condition:
         raise ReportError(message)
 
 
+# Read the stored pages and verify that they belong to the completed report in the receipt.
 def load_pages(receipt, client):
     """Only metadata and table-data reads; receipt pins one completed report."""
     for name, pattern in (
@@ -67,6 +69,7 @@ def load_pages(receipt, client):
     )
     table_id = ".".join(receipt[k] for k in ("project", "dataset", "table"))
 
+    # Check the stored table's schema and identity and return its version tag.
     def metadata(table):
         schema = table.schema
         require(
@@ -124,6 +127,7 @@ def load_pages(receipt, client):
     return pages
 
 
+# Translate a report URL and page number into the stored page key.
 def route_key(target):
     parsed = urlsplit(target)
     require(
@@ -141,7 +145,9 @@ def route_key(target):
     return ROUTES[parsed.path], int(page)
 
 
+# Create a web application that serves the verified report pages.
 def application(pages):
+    # Return a stored page or an HTTP error for an unsupported method or route.
     def serve(environ, start_response):
         method = environ.get("REQUEST_METHOD", "GET")
         path, query = environ.get("PATH_INFO", "/"), environ.get("QUERY_STRING", "")
@@ -164,6 +170,7 @@ def application(pages):
     return serve
 
 
+# Construct the report viewer from its receipt and the corresponding BigQuery pages.
 def create_app(receipt_path=None):
     """WSGI factory; Cloud Run must use private IAM/IAP, as with the prior service."""
     require(
@@ -186,6 +193,7 @@ def create_app(receipt_path=None):
     return application(pages)
 
 
+# Run the report viewer or check that its saved pages are available.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--receipt", default="report_receipt.json")
@@ -196,6 +204,7 @@ def main():
         app = create_app(args.receipt)
 
         class Quiet(WSGIRequestHandler):
+            # Suppress routine HTTP access messages from the local report server.
             def log_message(self, *args):
                 pass
 

@@ -1203,7 +1203,9 @@ footer {
   <script id="demo-data" type="application/json">@@DEMO_DATA@@</script>
   <script>
 "use strict";
+// Find a study control or result panel by its page ID.
 const el = id => document.getElementById(id);
+// Escape source text before displaying it in the study's HTML.
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
   "&": "&amp;",
   "<": "&lt;",
@@ -1211,17 +1213,24 @@ const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
   '"': "&quot;",
   "'": "&#39;"
 } [c]));
+// Recognize measured numeric values that can be displayed or plotted.
 const finite = value => typeof value === "number" && Number.isFinite(value);
+// Format a recorded measurement or display its missing-value label.
 const number = value => finite(value) ? value.toLocaleString("en-US", {
   maximumFractionDigits: 6
 }) : "Unavailable";
+// Format a decimal return as a signed percentage.
 const percent = value => finite(value) ? `${value > 0 ? "+" : ""}${(value * 100).toFixed(2)}%` :
   "Unavailable";
+// Format a fraction of the evidence as a percentage.
 const share = value => finite(value) ? `${(value * 100).toFixed(2)}%` : "Unavailable";
+// Choose the display style for a positive, negative, or neutral result.
 const tone = value => !finite(value) || value === 0 ? "neutral" : value > 0 ? "positive" : "negative";
+// Render the supplied research observations as an HTML list.
 const list = values => Array.isArray(values) && values.length ?
   `<ul class="research-list">${values.map(v => `<li>${esc(v)}</li>`).join("")}</ul>` :
   '<p class="meta">None recorded.</p>';
+// Display a complete calendar date or mark the date unavailable.
 const dateText = value => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value :
   "Unavailable";
 let DATA, summary, cases, dates, rankedDates, meanPath, report, selected, headlineLanguages = null,
@@ -1229,6 +1238,7 @@ let DATA, summary, cases, dates, rankedDates, meanPath, report, selected, headli
   evidenceQueries = null,
   evidenceRefs = [];
 
+// Offer the selected evidence as a formatted JSON file.
 function download(name, value) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], {
     type: "application/json"
@@ -1240,6 +1250,7 @@ function download(name, value) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Plot historical returns against the number of trading sessions since the match.
 function lineChart(lines, description) {
   const drawable = lines.filter(line => line.values.some(finite));
   if (!drawable.length)
@@ -1256,7 +1267,9 @@ function lineChart(lines, description) {
     R = 17,
     T = 18,
     B = 47;
+  // Convert a forward trading-session number to its horizontal chart position.
   const x = session => L + session / 20 * (W - L - R),
+    // Convert a return to its vertical chart position.
     y = value => T + (high - value) / (high - low) * (H - T - B);
   let svg =
     `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(description)}"><desc>${esc(description)}. Percent price return from T0. The horizontal axis is trading sessions, from zero through twenty.</desc>`;
@@ -1288,6 +1301,7 @@ function lineChart(lines, description) {
     `<text class="axis-title" x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle">Trading sessions after entry close</text></svg>`;
 }
 
+// Group historical date votes into the chosen time intervals and draw their distribution.
 function drawHistogram() {
   const bin = el("histogram-bin").value,
     length = {
@@ -1298,7 +1312,7 @@ function drawHistogram() {
     grouped = new Map();
   for (const row of dates) {
     const key = row.observed_day.slice(0, length);
-    grouped.set(key, (grouped.get(key) || 0) + row.votes);
+    grouped.set(key, (grouped.get(key) || 0) + row.votes);  // Add vote weights so ties keep their fractions.
   }
   const buckets = [...grouped].sort((a, b) => a[0].localeCompare(b[0]));
   if (!buckets.length) {
@@ -1313,12 +1327,15 @@ function drawHistogram() {
     B = 46,
     width = W - L - R,
     top = Math.max(1, ...buckets.map(b => b[1])) * 1.12;
+  // Convert a year, month, or day bucket to its starting instant for the time axis.
   const time = key => Date.parse(key.length === 4 ? `${key}-01-01T00:00:00Z` : key.length === 7 ?
     `${key}-01T00:00:00Z` : `${key}T00:00:00Z`);
   const first = time(buckets[0][0]),
     last = time(buckets.at(-1)[0]);
   const span = Math.max(1, last - first),
+    // Place a date bucket according to elapsed time and center a lone bucket.
     x = key => buckets.length === 1 ? L + width / 2 : L + 10 + (time(key) - first) / span * (width - 20),
+    // Scale a bucket's historical vote total to the height of the histogram.
     y = v => T + (1 - v / top) * (H - T - B);
   const distinct = bin === "year" ? Math.max(1, Number(buckets.at(-1)[0]) - Number(buckets[0][0]) + 1) :
     bin === "month" ? Math.max(1, span / (86400000 * 30.4375) + 1) : Math.max(1, span / 86400000 + 1);
@@ -1343,6 +1360,7 @@ function drawHistogram() {
     `<text class="axis-title" x="${(L+W-R)/2}" y="${H-3}" text-anchor="middle">Historical GKG observation ${bin}</text></svg>`;
 }
 
+// Show the selected historical date and its subsequent market returns.
 function drawSelected() {
   selected = dates.find(row => row.observed_day === el("selected-date").value);
   const path = selected?.forward_returns || [];
@@ -1376,6 +1394,7 @@ function drawSelected() {
     button.dataset.date === selected?.observed_day)));
 }
 
+// Select an available historical date and bring its details into view when requested.
 function selectDate(value, scroll = true) {
   if (!dates.some(row => row.observed_day === value)) return;
   el("selected-date").value = value;
@@ -1386,6 +1405,7 @@ function selectDate(value, scroll = true) {
   });
 }
 
+// Plot the vote-weighted mean market path and any selected individual paths.
 function drawMean() {
   const show = el("show-paths").checked;
   const lines = show ? dates.map(row => ({
@@ -1408,6 +1428,7 @@ function drawMean() {
   el("all-paths-label").hidden = !show;
 }
 
+// Turn cited query and historical article pairs into evidence inspection buttons.
 function referenceButtons(refs) {
   if (!Array.isArray(refs) || !refs.length)
   return '<p class="meta">No inspectable article pair cited.</p>';
@@ -1415,6 +1436,7 @@ function referenceButtons(refs) {
   return `<button class="button" data-evidence="${esc(encoded)}">Inspect ${number(refs.length)} cited pair${refs.length===1?"":"s"}</button>`;
 }
 
+// Show the study's recorded coverage, observation dates, and data limitations.
 function renderDisclosure() {
   const disclosure = DATA.disclosure;
   if (!disclosure) {
@@ -1430,6 +1452,7 @@ function renderDisclosure() {
   if (disclosure.historical_corpus?.documents) entries.push(disclosure.historical_corpus.documents);
   if (disclosure.model_review?.delivered_query_records) entries.push(disclosure.model_review
     .delivered_query_records);
+  // Render the coverage measures with their counts and interpretations.
   const table = items =>
     `<div class="table-wrap"><table class="scope-table"><thead><tr><th>Recorded measure</th><th>Count</th><th>Meaning and limitation</th></tr></thead><tbody>${items.map(item=>`<tr><td>${esc(item.label)}</td><td>${finite(item.value)?number(item.value):"Not recorded"}</td><td>${esc(item.unit||"")}${item.note?` · ${esc(item.note)}`:""}</td></tr>`).join("")}</tbody></table></div>`;
   const other = Object.entries(counts).filter(([key]) => !prominent.includes(key)).map(([, item]) =>
@@ -1438,6 +1461,7 @@ function renderDisclosure() {
     `<p>Saved, filtered evidence. Statistical representativeness has not been established. The receiving decision role may use, combine, discount or decline this research based on its evidence.</p>${table(entries)}<p class="chart-note">${esc(disclosure.selection?.method||"")} ${esc(disclosure.model_review?.interpretation||"")}</p><details><summary>Strengths, limitations and complete intake counts</summary><div class="research-columns"><section><h3>What this evidence supports</h3>${list(disclosure.strengths)}</section><section><h3>Limits of the evidence</h3>${list(disclosure.limitations)}</section></div>${other.length?table(other):""}<p class="meta">${esc(disclosure.historical_corpus?.scope||"")}</p></details>`;
 }
 
+// Display the reader's conclusions and link each citation to the underlying evidence.
 function renderResearch() {
   if (!report) {
     const state = DATA.research_receipt?.status || DATA.research_receipt?.state;
@@ -1462,6 +1486,7 @@ function renderResearch() {
     `${legacyNote}<h3 class="research-headline">${esc(report.headline)}</h3><p class="assessment">${esc(report.overall_assessment)}</p><div class="tags">${(report.current_themes||[]).map(theme=>`<span class="tag">${esc(theme)}</span>`).join("")}</div><div class="analogue-grid">${analogues||'<div class="empty">No leading analogue was selected.</div>'}</div>${alternatives?`<h3>Alternative comparisons</h3><div class="analogue-grid">${alternatives}</div>`:""}<div class="interpretation"><h3>Interpretation of the historical market evidence</h3><p>${esc(report.market_interpretation)}</p></div><div class="research-columns"><section><h3>Research implications</h3>${list(report.implications)}<h3>Questions for further research</h3>${list(report.questions)}</section><section><h3>Current themes left unexplained</h3>${list(report.uncovered_themes)}<h3>Limitations</h3>${list(report.limitations)}</section></div><p class="report-notes">Independent advisory research. The receiving decision role determines how much weight to give each source, including whether to use this report.<br>Model: ${esc(report.model||DATA.research_receipt?.model||"not recorded")} · Created: ${esc(report.created_at||"not recorded")}<br>Evidence delivered through tools: ${number(DATA.research_receipt?.inspected_query_count)} of ${number(summary.query_documents)} current stories; ${number(DATA.research_receipt?.inspected_market_dates?.length)} historical date paths. Delivery does not establish depth of review.</p>`;
 }
 
+// Create a link to the original article after validating its URL protocol.
 function sourceLink(value) {
   try {
     const url = new URL(value);
@@ -1471,6 +1496,7 @@ function sourceLink(value) {
   return '<span class="meta">Source link unavailable</span>';
 }
 
+// Look up the language recorded for a particular article headline.
 function headlineLanguage(doc) {
   const entry = headlineLanguages && doc?.title && Object.hasOwn(headlineLanguages, doc.title) ?
     headlineLanguages[doc.title] : null;
@@ -1481,6 +1507,7 @@ function headlineLanguage(doc) {
     };
 }
 
+// Populate the headline language filter from this study's saved classifications.
 function renderLanguageControl() {
   const packet = DATA.headline_languages;
   headlineLanguages = packet?.schema === "gdelt-headline-languages-v1" && packet.run_id === summary
@@ -1508,12 +1535,14 @@ function renderLanguageControl() {
     " Charts, research and JSON downloads use the full saved cohort. Stories retain their saved order.";
 }
 
+// Display a matched article with its metadata, score, and original source link.
 function documentCard(doc, label, metric) {
   if (!doc?.document_id)
   return `<div class="document"><div class="doc-label">${esc(label)}</div><p class="meta">No qualifying result in this channel.</p></div>`;
   return `<div class="document"><div class="doc-label">${esc(label)}</div><h3>${esc(doc.title||"GKG metadata document")}</h3><span class="tag">${headlineLanguages?`Detected headline language: ${esc(headlineLanguage(doc).name)}`:"Headline language unavailable"}</span><p class="meta">GKG observation ${esc(doc.observed_day||"unavailable")}${metric?` · ${esc(metric)} ${number(doc.score)} · ${number(doc.tie_count)} tied best`:""}</p><p>${sourceLink(doc.document_url)}</p><details><summary>Metadata and document identity</summary><code>${esc(doc.document_id)}</code><pre>${esc(doc.metadata_text||"No metadata text supplied.")}</pre></details></div>`;
 }
 
+// Filter the matched articles and display the requested page of results.
 function renderCases() {
   const term = el("article-search").value.trim().toLowerCase(),
     language = el("article-language").value;
@@ -1550,6 +1579,7 @@ function renderCases() {
   el("next-page").disabled = page + 1 >= pages;
 }
 
+// Load the embedded evidence and populate the research study's panels and controls.
 function start() {
   DATA = JSON.parse(el("demo-data").textContent);
   summary = DATA.summary;
@@ -1626,6 +1656,7 @@ function start() {
   renderResearch();
   renderLanguageControl();
   renderCases();
+  // Redraw the market paths and histogram to fit the resized window.
   globalThis.addEventListener?.("resize", () => {
     drawHistogram();
     drawSelected();
@@ -1634,33 +1665,40 @@ function start() {
   el("histogram-bin").addEventListener("change", drawHistogram);
   el("selected-date").addEventListener("change", drawSelected);
   el("show-paths").addEventListener("change", drawMean);
+  // Apply the new search text and return the evidence list to its first page.
   el("article-search").addEventListener("input", () => {
     page = 0;
     renderCases();
   });
+  // Clear the citation selection and display the full set of article matches.
   el("clear-evidence").addEventListener("click", () => {
     evidenceQueries = null;
     evidenceRefs = [];
     page = 0;
     renderCases();
   });
+  // Apply the selected headline language from the first page of results.
   el("article-language").addEventListener("change", () => {
     page = 0;
     renderCases();
   });
+  // Display the preceding page of matching articles.
   el("previous-page").addEventListener("click", () => {
     page--;
     renderCases();
   });
+  // Display the following page of matching articles.
   el("next-page").addEventListener("click", () => {
     page++;
     renderCases();
   });
+  // Export this study's article matches and the evidence behind its charts.
   el("download-evidence").addEventListener("click", () => download(`${summary.run_id}-evidence.json`, {
     summary,
     articles: DATA.articles,
     disclosure: DATA.disclosure || null
   }));
+  // Export the reader's research and its accompanying policy and evidence records.
   el("download-research").addEventListener("click", () => download(`${summary.run_id}-research.json`, {
     schema: "gdelt-research-delivery-v2",
     research: report,
@@ -1668,8 +1706,10 @@ function start() {
     disclosure: DATA.disclosure || null,
     provenance: DATA.research_provenance || null
   }));
+  // Export the evidence handoff prepared for the hedge worker.
   el("download-handoff").addEventListener("click", () => download(`${summary.run_id}-handoff.json`, DATA
     .handoff));
+  // Open the historical date or article evidence selected in the report.
   document.addEventListener("click", event => {
     const button = event.target.closest("button[data-date],button[data-evidence]");
     if (!button) return;

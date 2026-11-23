@@ -8,11 +8,13 @@ from pathlib import Path
 from ledger import MES, MULTIPLIER, number, usd
 
 
+# Format a dollar result to cents and display rounded negative zero as zero.
 def _dollars(amount):
     rendered = usd(amount)
     return "0.00" if rendered == "-0.00" else rendered
 
 
+# Compare candidate futures positions by exposure, fees, beta, and scenario profit or loss.
 def evaluate_hedges(
     book,
     contract,
@@ -76,7 +78,7 @@ def evaluate_hedges(
         net_beta = None if missing else (equity_beta_dollars + exposure) / nav
         results = {}
         for name, (index, equity_pnl) in moves.items():
-            overlay = exposure * index - fees
+            overlay = exposure * index - fees  # A short gains when the index falls.
             results[name] = dict(
                 overlay_after_cost_usd=_dollars(overlay),
                 versus_keep_usd=_dollars(delta * unit * index - fees),
@@ -136,6 +138,7 @@ CALCULATOR = {
 }
 
 
+# Validate a model tool request and evaluate its hedge targets against the recorded market.
 def calculator_call(inputs, arguments):
     args = json.loads(arguments)
     if not isinstance(args, dict) or set(args) != set(CALCULATOR["parameters"]["required"]):
